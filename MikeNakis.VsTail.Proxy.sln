@@ -1,0 +1,35 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MikeNakis.VsTail.Proxy", "MikeNakis.VsTail.Proxy\MikeNakis.VsTail.Proxy.csproj", "{E376895D-B10E-4FB2-9C3A-484DDF9BA00D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Solution Items", "_Solution Items", "{AEECC592-BD5E-4512-B613-4197A37ED3E7}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		VsTail-Logo.svg = VsTail-Logo.svg
+		exclusion.dic = exclusion.dic
+		LICENSE.md = LICENSE.md
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E376895D-B10E-4FB2-9C3A-484DDF9BA00D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E376895D-B10E-4FB2-9C3A-484DDF9BA00D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E376895D-B10E-4FB2-9C3A-484DDF9BA00D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E376895D-B10E-4FB2-9C3A-484DDF9BA00D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{228E9510-A541-4DDC-87E2-15EF91D569C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{228E9510-A541-4DDC-87E2-15EF91D569C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{228E9510-A541-4DDC-87E2-15EF91D569C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{228E9510-A541-4DDC-87E2-15EF91D569C3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
