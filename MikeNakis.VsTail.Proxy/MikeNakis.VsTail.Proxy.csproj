@@ -1,35 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<!--<TargetFrameworks>net8.0</TargetFrameworks>-->
 		<TargetFramework>net8.0</TargetFramework>
-		<LangVersion>12</LangVersion>
-		<ImplicitUsings>Disable</ImplicitUsings>
-		<Nullable>Enable</Nullable>
-
-		<AnalysisLevel>latest-Recommended</AnalysisLevel>
-		<RunAnalyzersDuringBuild>True</RunAnalyzersDuringBuild>
-		<RunAnalyzersDuringLiveAnalysis>True</RunAnalyzersDuringLiveAnalysis>
-
-		<WarningLevel>9999</WarningLevel>
-
-		<!-- PEARL: if TreatWarningsAsErrors is set to true, then any .editorconfig inspections that are configured to
-		            appear as warnings will appear as errors instead. -->
-		<!-- <TreatWarningsAsErrors>True</TreatWarningsAsErrors> -->
 
 		<!-- Magical incantations necessary for the magic to work -->
-		<IsPackable>false</IsPackable>
-		<PreserveCompilationContext>false</PreserveCompilationContext>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
-		<CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+		<!--<IsPackable>false</IsPackable>
+		<PreserveCompilationContext>false</PreserveCompilationContext>-->
 	</PropertyGroup>
 
 	<ItemGroup>
-		<!-- PEARL: if this file is not found, we get silent failure. -->
-		<GlobalAnalyzerConfigFiles Include="../../MikeNakis.GlobalConfig/AllCode.globalconfig" />
-		<GlobalAnalyzerConfigFiles Include="../../MikeNakis.GlobalConfig/ProductionCode.globalconfig" />
+		<PackageReference Include="MikeNakis.CommonFiles" Version="1.*" />
 	</ItemGroup>
 
 </Project>

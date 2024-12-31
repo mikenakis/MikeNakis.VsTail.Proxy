@@ -1,11 +1,12 @@
 # VsTail.Proxy<br><sup><sub>Connects to `VsTail`, which speeds up Visual Studio debug output by orders of magnitude.</sup></sub>
 
+<!--- Note: This image looks fine in most markdown renderers, 
+            but not in Visual Studio, whose built-in markdown renderer is broken nowadays. 
+			Someone has brought it to their attention, (https://developercommunity.visualstudio.com/t/10774870)
+			and last I checked they were "investigating". -->
 <p align="center">
 <img title="VsTail logo" src="VsTail-logo.svg" width="256"/><br/>
 </p>
-
-<sup>Note: The above image looks fine in most markdown renderers, but not in Visual Studio, whose built-in markdown renderer is broken nowadays.
-[Someone has brought it to their attention](https://developercommunity.visualstudio.com/t/10774870), and last I checked they were "investigating".</sup>
 
 `MikeNakis.VsTail.Proxy` is a tiny open-source dotnet library that you can use for integrating `MikeNakis.VsTail` into your application. 
 
