@@ -32,7 +32,7 @@ public sealed class VsTailProxy
 	/// An object that maintains an open connection with VsTail. This object should be stored for the duration 
 	/// of the application's runtime, so that VsTail knows when the application terminates.
 	/// </returns>
-	public static object? Connect( string logPathName, string solutionName, Sys.TimeSpan? connectionTimeOut = null )
+	public static object? TryConnect( string logPathName, string solutionName, Sys.TimeSpan? connectionTimeOut = null )
 	{
 		if( !SysDiag.Debugger.IsAttached )
 		{
@@ -51,13 +51,13 @@ public sealed class VsTailProxy
 
 		static object? connect( string logPathName, string solutionName, Sys.TimeSpan connectionTimeOut )
 		{
-			//string executablePathName = getExecutablePathName();
 			try
 			{
 				return connectToServer( logPathName, solutionName, Sys.TimeSpan.FromSeconds( 1 ) );
 			}
-			catch( Sys.Exception )
+			catch( Sys.TimeoutException )
 			{
+				log( $"VsTail is not running, will launch..." );
 			}
 			launchServerApp();
 			return connectToServer( logPathName, solutionName, connectionTimeOut );
@@ -78,7 +78,7 @@ public sealed class VsTailProxy
 				SysPipes.NamedPipeClientStream pipe = new( ".", serverPipeName, SysPipes.PipeDirection.InOut, SysPipes.PipeOptions.None );
 				pipe.Connect( connectionTimeOut );
 				SysIo.StreamWriter writer = new( pipe );
-				writer.WriteLine( $"LogFile file={logPathName} solution={solutionName}" );
+				writer.WriteLine( $"LogFile --file={logPathName} --solution={solutionName}" );
 				writer.Flush();
 				return pipe;
 			}
@@ -139,9 +139,22 @@ public sealed class VsTailProxy
 
 	static string getExecutablePathName()
 	{
-		SysReflect.Assembly? entryAssembly = SysReflect.Assembly.GetEntryAssembly() ?? throw newException( $"Failed to determine entry assembly." );
-		return entryAssembly.Location;
+		//SysReflect.Assembly? entryAssembly = SysReflect.Assembly.GetEntryAssembly() ?? throw newException( $"Failed to determine entry assembly." );
+		//return entryAssembly.Location;
+		return Identity( "42" );
 	}
+
+	public static T Identity<T>( T item ) => item;
+}
+
+static class Test
+{
+	static string foo()
+	{
+		return "";
+	}
+
+	public static string Covfefe() => "{nameof( Sys.Int32 )}";
 }
 
 public sealed class VsTailProxyException : Sys.Exception
