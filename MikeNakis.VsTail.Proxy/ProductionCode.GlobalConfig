@@ -1,0 +1,17 @@
+# Global AnalyzerConfig
+# https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/configuration-files#global-analyzerconfig
+
+is_global = true
+
+# IDE0100: "Remove unnecessary equality operator" a.k.a. "Remove redundant equality"
+dotnet_diagnostic.IDE0100.severity = warning
+
+# CA1707: "Identifiers should not contain underscores"
+# PEARL: To set the severity, we have to use 'dotnet_diagnostic.CA1707.severity', but to set the api surface, we have to
+#        use 'dotnet_code_quality.CA1707.api_surface'! Go figure.
+dotnet_diagnostic.CA1707.severity = true
+
+	dotnet_code_quality.CA1707.api_surface = all
+
+# CA1515: "Consider making public types internal"
+dotnet_diagnostic.CA1515.severity = warning

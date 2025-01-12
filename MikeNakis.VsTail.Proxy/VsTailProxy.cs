@@ -36,7 +36,7 @@ public sealed class VsTailProxy
 	{
 		if( !SysDiag.Debugger.IsAttached )
 		{
-			log( $"Will not connect because no debugger is attached." );
+			log( "Will not connect because no debugger is attached." );
 			return null;
 		}
 		try
@@ -45,7 +45,7 @@ public sealed class VsTailProxy
 		}
 		catch( Sys.Exception exception )
 		{
-			log( $"Failed to connect", exception );
+			log( "Failed to connect", exception );
 			return null;
 		}
 
@@ -57,7 +57,7 @@ public sealed class VsTailProxy
 			}
 			catch( Sys.TimeoutException )
 			{
-				log( $"VsTail is not running, will launch..." );
+				log( "VsTail is not running, will launch..." );
 			}
 			launchServerApp();
 			return connectToServer( logPathName, solutionName, connectionTimeOut );
@@ -85,7 +85,7 @@ public sealed class VsTailProxy
 		}
 	}
 
-	static void log( string message ) => SysDebug.WriteLine( $"{nameof( VsTailProxy )}: {message}" );
+	static void log( string message ) => SysDebug.WriteLine( $"{typeof( VsTailProxy ).FullName}: {message}" );
 
 	static void log( string message, Sys.Exception exception ) => log( buildMediumExceptionMessage( message, exception ) );
 
@@ -128,7 +128,7 @@ public sealed class VsTailProxy
 			//       explain under what circumstances this may happen. From what I gather, this may happen if you use
 			//       "ShellExecute" to launch a document, and the handling process happens to already be running, so no
 			//       new instance of the handling process is started.
-			SysDiag.Process? process = SysDiag.Process.Start( processStartInfo ) ?? throw newException( $"Process.Start() returned `null`" );
+			SysDiag.Process? process = SysDiag.Process.Start( processStartInfo ) ?? throw newException( "Process.Start() returned `null`" );
 			process.WaitForInputIdle();
 		}
 		catch( Sys.Exception exception )
@@ -136,25 +136,6 @@ public sealed class VsTailProxy
 			throw newException( $"Failed to launch {executableFilePath}", exception );
 		}
 	}
-
-	static string getExecutablePathName()
-	{
-		//SysReflect.Assembly? entryAssembly = SysReflect.Assembly.GetEntryAssembly() ?? throw newException( $"Failed to determine entry assembly." );
-		//return entryAssembly.Location;
-		return Identity( "42" );
-	}
-
-	public static T Identity<T>( T item ) => item;
-}
-
-static class Test
-{
-	static string foo()
-	{
-		return "";
-	}
-
-	public static string Covfefe() => "{nameof( Sys.Int32 )}";
 }
 
 public sealed class VsTailProxyException : Sys.Exception

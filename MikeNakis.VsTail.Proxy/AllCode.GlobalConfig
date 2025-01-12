@@ -1,0 +1,2462 @@
+# Global AnalyzerConfig
+# See https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/configuration-files#global-analyzerconfig
+
+is_global = true
+
+#######################################################################################################################
+# Severities for dotnet diagnostics:
+#   error      - Violations appear as build errors and cause builds to fail.
+#   warning    - Violations appear as build warnings but do not cause builds to fail (unless you have an option set to
+#                treat warnings as errors).
+#   suggestion - Violations appear as build messages and as suggestions in the Visual Studio IDE.
+#                PEARL: no, they do not appear as build messages. Only as suggestions in the IDE.
+#   silent     - Violations aren't visible to the user.
+#                PEARL: this is not the whole truth: violations are not visible, but fixes are available.
+#   none       - Rule is suppressed completely.
+#                PEARL: what they really mean is: violations are not visible, and fixes are not available either.
+#   default    - The default severity of the rule is used. The default severities for each .NET release are listed in
+#                the roslyn-analyzers repo. In that table, "Disabled" corresponds to none, "Hidden" corresponds to
+#                silent, and "Info" corresponds to suggestion.
+
+#######################################################################################################################
+# "Code style" rules (IDExxxx)
+
+# IDE0001: "Simplify name"
+dotnet_diagnostic.IDE0001.severity = warning
+
+# IDE0002: "Simplify member access"
+dotnet_diagnostic.IDE0002.severity = warning
+
+# IDE0003: "Remove this or Me qualification"
+# Also see IDE0009: "Add this or Me qualification"
+dotnet_diagnostic.IDE0003.severity = warning
+# Justification: Never use 'this' unless necessary.
+
+	# Options: See IDE0009
+
+# IDE0004: "Remove unnecessary cast"
+dotnet_diagnostic.IDE0004.severity = warning
+
+# IDE0005: "Remove unnecessary using directives" / "Using directive is unnecessary"
+dotnet_diagnostic.IDE0005.severity = warning
+
+# Undocumented/non-existent
+dotnet_diagnostic.IDE0006.severity = error
+
+# IDE0007: "Use 'var' instead of explicit type"
+# Also see IDE0008: "Use explicit type instead of 'var'"
+dotnet_diagnostic.IDE0007.severity = silent
+# Justification: See IDE0008
+
+# IDE0008: "Use explicit type instead of 'var'"
+# Also see IDE0007: "Use 'var' instead of explicit type".
+# Also see IDE0090: "Simplify `new` expression" (a.k.a. "target-typed `new`")
+dotnet_diagnostic.IDE0008.severity = warning
+# Justification: Here is a rule worth living by: "Any choice that makes code easier to read is preferable over any
+#    choice that makes code easier to write".
+#    The use of `var` makes code easier to write, but not easier to read, because it often leaves the reader wondering
+#    what is the exact type hidden by `var`.
+#    Therefore, never use `var` unless the type is obvious.
+#    The type is obvious only when assigning:
+#      - a literal of a built-in type. (e.g. `var a = "covfefe";`, `var a = 42;`, `var a = 5.0;`)
+#      - the result of `new`. (e.g. `var a = new Foo();`)
+#      - the result of a type-cast. (e.g. `var a = (int)b;`)
+#    - In the case of built-in types, there is nothing to be gained from saying `var a = 5;` vs. `int a = 5;`.
+#    - In the case of `new`, it is better to use target-typed new, as in `Foo a = new();`
+#    - In the case of a type-cast, we would like to be able to use `var`, but we cannot have that! see
+#      `csharp_style_var_when_type_is_apparent`.
+
+	# Options for IDE0007 and IDE0008
+	csharp_style_var_for_built_in_types = false
+	csharp_style_var_elsewhere = false
+	# PEARL: Ideally, we would like to allow the use of `var` when a variable receives the result of a type-cast,
+	#        but there is no option specifically for that.
+	#        Instead, there is this blanket option `csharp_style_var_when_type_is_apparent`.
+	#        However, if this option is set to `true`, the use of `var` is also allowed when the variable receives the
+	#        result of `new`, but when that is allowed, analysis will never suggest IDE0090: "Simplify `new` 
+	#        expression" (a.k.a. "target-typed `new`") which, I think, is more useful.
+	#        As a result of this, we cannot allow the use of `var` anywhere.
+	#        Feel free to momentarily use `var` when declaring a variable, and then immediately ask the IDE to refactor
+	#        that `var` into the actual type.
+	csharp_style_var_when_type_is_apparent = false
+
+# IDE0009: "Add this or Me qualification"
+# Also see IDE0003: "Remove this or Me qualification"
+dotnet_diagnostic.IDE0009.severity = none
+# Justification: Never use 'this' unless necessary.
+
+	# Options for IDE0003, IDE0009
+	dotnet_style_qualification_for_field = false
+	dotnet_style_qualification_for_property = false
+	dotnet_style_qualification_for_method = false
+	dotnet_style_qualification_for_event = false
+
+# IDE0010: "Add missing cases to switch statement"
+# Also see IDE0072: "Add missing cases to switch expression"
+dotnet_diagnostic.IDE0010.severity = none
+# PEARL: Normally, we would want to have this rule; however, it triggers on pattern-matching switches where it really
+#        has nothing to suggest, and on those switches, it requires us to add an entirely redundant default clause which
+#        contains nothing but a break. So, if we were to have this rule enabled, we would be forced to also have
+#        redundant default clauses all over the place.
+# TODO:  Consider enabling this rule and going through the trouble of adding default clauses in all switch statements in
+#        the entire solution, if doing so would allow us to use the absence of a default clause as an indication that we
+#        expect the case clauses to be exhaustive and to receive a warning if a case clause is missing.
+
+# IDE0011: "Add braces"
+# PEARL: This rule is stupendously biased. Not only its name reflects a specific choice of `true`, but also, the only
+#        choice that actually works is `true`.  The `false` choice does absolutely nothing, while the `when_multiline`
+#        choice does something bizarre: it requires the `then` part of an `if` statement to have braces if the `else`
+#        part is multi-line and vice versa. (Go figure.)
+# PEARL: Since "Add braces" cannot be configured to `false`, and since there is no "Remove braces" rule, we currently
+#        cannot have a warning when someone litters our code-base with redundant curly braces.
+#        This is typical Microsoft: they pretend to give you the option to choose, but they only give you one choice.
+#        "You can have it in any color you like, as long as it is blue."
+dotnet_diagnostic.IDE0011.severity = warning
+
+	# Possible values: `true`, `false`, and `when_multiline`. Default is `true`.
+	csharp_prefer_braces = false
+	# Justification: Never use braces unless necessary.
+
+# Undocumented/non-existent
+dotnet_diagnostic.IDE0012.severity = error
+dotnet_diagnostic.IDE0013.severity = error
+dotnet_diagnostic.IDE0014.severity = error
+dotnet_diagnostic.IDE0015.severity = error
+
+# IDE0016: "Use throw expression"
+dotnet_diagnostic.IDE0016.severity = suggestion
+
+	# Possible values: `true` and `false`. Default is `true`.
+	csharp_style_throw_expression = true
+
+# IDE0017: "Use object initializers" / "Simplify object initialization"
+dotnet_diagnostic.IDE0017.severity = none
+
+	# Possible values: `true` and `false`.  Default is `true`.
+	# PEARL: Adding `:<severity>` here causes silent failure. Severity can only be specified via the cryptic rule id.
+	dotnet_style_object_initializer = false
+
+# IDE0018: "Inline variable declaration"
+dotnet_diagnostic.IDE0018.severity = warning
+
+	# Possible values: `true` and `false`. Default is `true`.
+	csharp_style_inlined_variable_declaration = true
+
+# IDE0019: "Use pattern matching to avoid 'as' followed by a 'null' check"
+# Also see IDE0078: "Use pattern matching"
+# Also see IDE0260: "Use pattern matching"
+dotnet_diagnostic.IDE0019.severity = warning
+
+	# Possible values: `true` and `false`. Default is `true`.
+	# PEARL: `csharp_style_pattern_matching_over_as_with_null_check` controls both IDE0019 and IDE0260.
+	csharp_style_pattern_matching_over_as_with_null_check = true
+
+# IDE0020: "Use pattern matching to avoid is check followed by a cast (with variable)"
+# Also see IDE0038: "Use pattern matching to avoid is check followed by a cast (without variable)"
+dotnet_diagnostic.IDE0020.severity = warning
+
+	# For options, see IDE0038
+
+# IDE0021: "Use expression body for constructors"
+dotnet_diagnostic.IDE0021.severity = silent
+
+	# Possible values: "true", "false", and "when_on_single_line".
+	csharp_style_expression_bodied_constructors = false
+
+# IDE0022: "Use expression body for methods"
+dotnet_diagnostic.IDE0022.severity = silent
+
+	# PEARL: Adding `:<severity>` here causes silent failure. Severity can only be specified via the cryptic rule id.
+	csharp_style_expression_bodied_methods = when_on_single_line
+
+# IDE0023: "Use expression body for conversion operators"
+dotnet_diagnostic.IDE0023.severity = warning
+
+	# For options, see IDE0024
+
+# IDE0024: "Use expression body for operators"
+dotnet_diagnostic.IDE0024.severity = warning
+
+	# PEARL: This option applies to both IDE0023 and IDE0024
+	csharp_style_expression_bodied_operators = when_on_single_line
+
+# IDE0025: "Use expression body for properties"
+dotnet_diagnostic.IDE0025.severity = warning
+
+	csharp_style_expression_bodied_properties = when_on_single_line
+
+# IDE0026: "Use expression body for indexers"
+dotnet_diagnostic.IDE0026.severity = warning
+
+	csharp_style_expression_bodied_indexers = when_on_single_line
+
+# IDE0027: "Use expression body for accessors"
+dotnet_diagnostic.IDE0027.severity = warning
+
+	csharp_style_expression_bodied_accessors = when_on_single_line
+
+# IDE0028: "Use collection initializers"
+dotnet_diagnostic.IDE0028.severity = silent
+
+	dotnet_style_collection_initializer = true
+
+# IDE0029: "Null check can be simplified (ternary conditional check)"
+# See also IDE0030: "Null check can be simplified (nullable ternary conditional check)"
+# See also IDE0270: "Null check can be simplified (if null check)"
+dotnet_diagnostic.IDE0029.severity = suggestion
+
+	# PEARL: the `dotnet_style_coalesce_expression` option somehow controls IDE0029, IDE0030, and IDE0270
+	dotnet_style_coalesce_expression = true
+
+# IDE0030: "Null check can be simplified (nullable ternary conditional check)"
+# See also IDE0029: "Null check can be simplified (ternary conditional check)"
+# See also IDE0270: "Null check can be simplified (if null check)"
+dotnet_diagnostic.IDE0030.severity = suggestion
+
+	# Options: see IDE0029
+
+# IDE0031: "Use null propagation"
+dotnet_diagnostic.IDE0031.severity = suggestion
+
+	dotnet_style_null_propagation = true
+
+# IDE0032: "Use auto-implemented property"
+dotnet_diagnostic.IDE0032.severity = suggestion
+
+	dotnet_style_prefer_auto_properties = true
+
+# IDE0033: "Use explicitly provided tuple name"
+dotnet_diagnostic.IDE0033.severity = warning
+
+	dotnet_style_explicit_tuple_names = true
+
+# IDE0034: "Simplify 'default' expression"
+dotnet_diagnostic.IDE0034.severity = suggestion
+
+	csharp_prefer_simple_default_expression = true
+
+# IDE0035: "Remove unreachable code"
+dotnet_diagnostic.IDE0035.severity = warning
+
+# IDE0036: "Order modifiers"
+dotnet_diagnostic.IDE0036.severity = warning
+# Justification:
+#     - 'new' must be last so as to be as close as possible to the name
+#     - 'readonly' must be placed before 'override'
+
+	csharp_preferred_modifier_order = public, private, protected, internal, file, static, extern, virtual, abstract, sealed, readonly, override, unsafe, required, volatile, async, new
+
+# IDE0037: "Use inferred member names"
+dotnet_diagnostic.IDE0037.severity = silent
+
+	dotnet_style_prefer_inferred_tuple_names = true
+	dotnet_style_prefer_inferred_anonymous_type_member_names = true
+
+# IDE0038: "Use pattern matching to avoid is check followed by a cast (without variable)"
+# See also IDE0020: "Use pattern matching to avoid is check followed by a cast (with variable)"
+dotnet_diagnostic.IDE0038.severity = warning
+
+	# PEARL: 'csharp_style_pattern_matching_over_is_with_cast_check' somehow controls both IDE0020 and IDE0038
+	csharp_style_pattern_matching_over_is_with_cast_check = true
+
+# IDE0039: Use local function instead of lambda
+dotnet_diagnostic.IDE0039.severity = silent
+# Justification: lambdas are perfectly fine; we use 'silent' so as to retain the option to refactor under "quick fixes".
+
+	csharp_style_prefer_local_over_anonymous_function = true
+
+# IDE0040: "Add accessibility modifiers" / "Accessibility modifiers required"
+# PEARL: The question that this rule deals with is not about accessibility modifiers at large, it is about accessibility
+#        modifiers which are the same as the defaults and therefore redundant.
+# PEARL: The name of this rule is biased: it assumes we want redundant accessibility modifiers to always be added,
+#        whereas its very purpose of existence is precisely to give us the freedom to choose, and what we choose is the
+#        opposite of what its name assumes: Redundant modifiers must always be removed.
+dotnet_diagnostic.IDE0040.severity = warning
+# Justification: The language has certain default accessibilities, and it allows you to repeat them explicitly.
+#    Explicitly repeating the defaults is optional and redundant.
+#    The general rule we follow is: If something is optional and redundant, then it should be omitted.
+#    If it is unclear to you what the language defaults are, then go learn the language _fully_ and come back
+#    only when you are done.
+#    Additionally, there is merit in never specifying the accessibility of private methods because while
+#    refactoring we often try nesting and un-nesting methods, and a nested method _cannot_ have an accessibility
+#    modifier, so we would rather not be hit with the 'gotcha' of having to also add or remove the `private`
+#    modifier each time we nest / un-nest a method.
+
+	dotnet_style_require_accessibility_modifiers = omit_if_default
+
+# IDE0041: "Use 'is null' check"
+dotnet_diagnostic.IDE0041.severity = suggestion
+
+	dotnet_style_prefer_is_null_check_over_reference_equality_method = true
+
+# IDE0042: "Deconstruct variable declaration"
+dotnet_diagnostic.IDE0042.severity = suggestion
+
+	csharp_style_deconstructed_variable_declaration = true
+
+# Undocumented/non-existent
+dotnet_diagnostic.IDE0043.severity = error
+
+# IDE0044: "Add readonly modifier"
+dotnet_diagnostic.IDE0044.severity = warning
+
+	dotnet_style_readonly_field = true
+
+# IDE0045: "Use conditional expression for assignment"
+# TODO: revise this.
+dotnet_diagnostic.IDE0045.severity = silent
+
+	dotnet_style_prefer_conditional_expression_over_assignment = true
+
+# IDE0046: "Use conditional expression for return" / "Convert to conditional expression"
+dotnet_diagnostic.IDE0046.severity = silent
+
+	dotnet_style_prefer_conditional_expression_over_return = false
+
+# IDE0047: "Remove unnecessary parentheses"
+# See also: IDE0048: "Add parentheses for clarity"
+dotnet_diagnostic.IDE0047.severity = suggestion
+
+	# Options: See IDE0048
+
+# IDE0048: "Add parentheses for clarity"
+# See also: IDE0047: "Remove unnecessary parentheses"
+dotnet_diagnostic.IDE0048.severity = suggestion
+
+	# Options for IDE0047 and IDE0048 (it is unclear exactly how these work together.)
+	dotnet_style_parentheses_in_arithmetic_binary_operators = never_if_unnecessary
+	dotnet_style_parentheses_in_relational_binary_operators = never_if_unnecessary
+	dotnet_style_parentheses_in_other_binary_operators = never_if_unnecessary
+	dotnet_style_parentheses_in_other_operators = never_if_unnecessary
+
+# IDE0049: "Use language keywords instead of framework type names for type references"
+dotnet_diagnostic.IDE0049.severity = warning
+
+	dotnet_style_predefined_type_for_locals_parameters_members = true
+	dotnet_style_predefined_type_for_member_access = true
+
+# IDE0050: "Convert anonymous type to tuple"
+dotnet_diagnostic.IDE0050.severity = warning
+
+# IDE0051: "Remove unused private member"
+# Note: this is about private members that are NEITHER READ NOR WRITTEN.
+# PEARL: Presumably due to some roslyn or Visual Studio bug, if `nameof( <type> )` appears anywhere within a class,
+#    then this rule stops working for private methods in that class. (Where <type> can be any type, and "anywhere"
+#    includes even parameters to attributes on that class, and even different parts of a partial class.) 
+#    The workaround to this bug is to never use `nameof( <type> )`; use `typeof( <type> ).Name` instead.
+#    Also see IDE0082: "Convert typeof to nameof".
+# PEARL: If the severity of IDE0051 is set to "warning", then the code cleanup action "Fix analyzer warnings and errors
+#    set in EditorConfig" will cause entire unused functions to be removed from the code! This is an extremely 
+#    narrow-minded interpretation of the aim to only make non-breaking changes. The workaround is to never ask any "code
+#    quality" tools made by Microsoft to fix any issues; have them report the issues, and fix them manually.
+dotnet_diagnostic.IDE0051.severity = warning
+
+# IDE0052: "Remove unread private member"
+# Note: this is about private members that are WRITTEN BUT NOT READ.
+# PEARL: Under certain circumstances, IDE0052 does not work. Unread private members are not reported, and suppressions
+#        of such warnings are in turn flagged with IDE0079: "Remove unnecessary suppression".
+#        This is happening due to a compiler bug which was reported all the way back in 2021 and it has still not been
+#        fixed as of today, 2024. (See https://github.com/dotnet/roslyn/issues/54972)
+dotnet_diagnostic.IDE0052.severity = warning
+
+# IDE0053: "Use expression body for lambdas"
+dotnet_diagnostic.IDE0053.severity = silent
+# Justification: we set the severity to `silent` so that Visual Studio never bothers us with this, but we set the option
+#    to `true` so as to be offered the option to apply the refactoring.
+
+	csharp_style_expression_bodied_lambdas = true
+
+# IDE0054: "Use compound assignment"
+# Also see IDE0074: "Use coalesce compound assignment"
+dotnet_diagnostic.IDE0054.severity = warning
+
+	# PEARL: `dotnet_style_prefer_compound_assignment` somehow controls both IDE0054: "Use compound assignment" and 
+	#        IDE0074: "Use coalesce compound assignment".
+	# PEARL: Adding `:<severity>` here causes silent failure. Severity can only be specified via the cryptic rule id.
+	dotnet_style_prefer_compound_assignment = true
+
+# IDE0055: "Formatting rule"
+# PEARL: this rule must be configured in .editorconfig, not in .globalconfig.
+#        To be fair, the documentation states that .globalconfig is meant for code analysis rules, not for formatting
+#        rules.
+#        However, this limitation appears to have been introduced in order to cover up for bugs:
+#        If you specify IDE0055 in .globalconfig instead of .editorconfig, the built-in formatter of Visual Studio will
+#        continue to work fine, and the "Format Code" option of the "Code Cleanup" command of Visual Studio will also
+#        continue to work fine, but `dotnet format` (or `dotnet format whitespace`) will completely mess up your code
+#        by applying all default formatting to it, because it is apparently unaware of .globalconfig.
+
+# IDE0056: "Use index operator"
+dotnet_diagnostic.IDE0056.severity = suggestion
+
+	csharp_style_prefer_index_operator = true
+
+# IDE0057 "Use range operator"
+dotnet_diagnostic.IDE0057.severity = suggestion
+
+	csharp_style_prefer_range_operator = true
+
+# IDE0058: "Expression value is never used" / "Remove unnecessary expression value"
+dotnet_diagnostic.IDE0058.severity = silent
+
+	csharp_style_unused_value_expression_statement_preference = unused_local_variable
+
+# IDE0059 "Remove unnecessary value assignment"
+dotnet_diagnostic.IDE0059.severity = warning
+
+	csharp_style_unused_value_assignment_preference = discard_variable
+
+# IDE0060: "Remove unused parameter"
+# PEARL: When the severity of IDE0060 is "warning", the command `dotnet format style` will issue a message saying:
+#          > Unable to fix IDE0060. No associated code fix found.
+dotnet_diagnostic.IDE0060.severity = warning
+
+	dotnet_code_quality_unused_parameters = all
+
+# IDE0061: "Use expression body for local functions"
+# Valid values are true, when_on_single_line, and false (the default).
+# PEARL: The visual indicators shown by Visual Studio for suggestions are usually inconspicuous, as they should be.
+#        However, when Visual Studio shows a suggestion indicator for this rule, it is highly conspicuous, thus
+#        defeating the purpose of it being a suggestion.
+dotnet_diagnostic.IDE0061.severity = silent
+# Justification: See PEARL command above.
+
+	csharp_style_expression_bodied_local_functions = when_on_single_line
+
+# IDE0062: "Make local function static"
+dotnet_diagnostic.IDE0062.severity = warning
+
+	csharp_prefer_static_local_function = true
+
+# IDE0063: "Use simple 'using' statement" / "'using' statement can be simplified"
+dotnet_diagnostic.IDE0063.severity = silent
+# Justification: The so-called "simple" 'using' statement is anything but simple. It _looks_ simple, but something
+#    looking simple and something actually being simple are two entirely unrelated things.
+#    The so-called "simple" 'using' statement relinquishes control over the exact moment at which disposal will happen.
+#    It can be okay to use in some cases, but in most cases it should be avoided. Therefore, the rules governing it must
+#    be very quiet about it.
+
+	# PEARL: Adding `:<severity>` here causes silent failure. Severity can only be specified via the cryptic rule id.
+	csharp_prefer_simple_using_statement = false
+
+# IDE0064: "Make struct fields writable"
+# PEARL: This rule is brain-damaged. If it is ever triggered, it does not, of course, mean that any struct fields should
+#        be made writable.  It means that the struct has a method that assigns to `this`, which should be avoided.
+dotnet_diagnostic.IDE0064.severity = warning
+
+# IDE0065: "'using' directive placement"
+dotnet_diagnostic.IDE0065.severity = warning
+# Justification: This is the subject of many a heated discussion among C# programmers all over the world.
+#    Here is a rule worth living by: The scope of anything should be the smallest possible.
+#    The smallest possible scope for `using` directives is _within_ the namespace.
+#    Therefore, the only right place for `using` directives is within the namespace, end of story.
+
+	csharp_using_directive_placement = inside_namespace
+
+# IDE0066: "Use switch expression"
+dotnet_diagnostic.IDE0066.severity = warning
+
+	csharp_style_prefer_switch_expression = true
+
+# Undocumented/non-existent
+dotnet_diagnostic.IDE0067.severity = error
+dotnet_diagnostic.IDE0068.severity = error
+dotnet_diagnostic.IDE0069.severity = error
+
+# IDE0070: "Use 'System.HashCode.Combine'"
+dotnet_diagnostic.IDE0070.severity = warning
+
+# IDE0071: "Simplify interpolation"
+dotnet_diagnostic.IDE0071.severity = warning
+
+	dotnet_style_prefer_simplified_interpolation = true
+
+# IDE0072: "Add missing cases to switch expression" / "Populate switch"
+# Also see IDE0010: "Add missing cases to switch statement"
+dotnet_diagnostic.IDE0072.severity = silent
+# PEARL: Normally, we would want a rule which warns us about missing cases, but this particular rule will flag a switch
+#        statement even if it has a default clause / fall-through case, so it is useless.
+# TODO:  Reconsider this. Perhaps all switch statements should have a default clause / fall-through case.
+
+# IDE0073: "Require file header"
+dotnet_diagnostic.IDE0073.severity = none
+# Justification: #AintNoBodyGotNoTimeFoDat.
+
+	file_header_template = unset
+
+# IDE0074: "Use coalesce compound assignment"
+# Also see IDE0054: "Use compound assignment"
+dotnet_diagnostic.IDE0074.severity = warning
+
+	# Options: see IDE0054: "Use compound assignment"
+
+# IDE0075: "Simplify conditional expression"
+dotnet_diagnostic.IDE0075.severity = warning
+
+	dotnet_style_prefer_simplified_boolean_expressions = true
+
+# IDE0076: "Remove invalid global 'SuppressMessageAttribute'"
+dotnet_diagnostic.IDE0076.severity = error
+
+# IDE0077: "Avoid legacy format target in global 'SuppressMessageAttribute'"
+dotnet_diagnostic.IDE0077.severity = error
+
+# IDE0078: "Use pattern matching"
+# Also see IDE0019: "Use pattern matching to avoid 'as' followed by a 'null' check"
+# Also see IDE0260: "Use pattern matching"
+# PEARL: This diagnostic has the same name as IDE0260: "Use pattern matching"
+dotnet_diagnostic.IDE0078.severity = warning
+
+	csharp_style_prefer_pattern_matching = true
+
+# IDE0079: "Remove unnecessary suppression"
+dotnet_diagnostic.IDE0079.severity = warning
+
+	# Values: comma-separated list of rule ids or categories to exclude, or 'all' to disable, or 'none' to apply everywhere.
+	dotnet_remove_unnecessary_suppression_exclusions = none
+
+# IDE0080: "Remove unnecessary suppression operator"
+# PEARL: The null-forgiving operator is also known as the damnit operator, and this rule unnecessarily introduces yet
+#        one more synonym for it, by calling it "suppression operator".
+dotnet_diagnostic.IDE0080.severity = warning
+
+# IDE0081: "Remove ByVal"
+# Note: This is a Visual Basic-only rule, and we do not care at all about Visual Basic.
+# dotnet_diagnostic.IDE0081.severity = none
+
+# IDE0082: "Convert typeof to nameof"
+# PEARL: Presumably due to some Roslyn / Visual Studio bug, if `nameof( <type> )` appears anywhere within a class, then
+#    IDE0051: "Remove unused private member" stops working for unused methods in that class. The workaround is to
+#    replace all instances of `nameof( <type> )` with `typeof( <type> ).Name`. Unfortunately, this workaround is not
+#    applicable in cases where the name of a type must be a compile-time constant, so there are some situations where we
+#    have to use `nameof( <type> )` and just live with the bug.
+dotnet_diagnostic.IDE0082.severity = none
+# Justification: Normally this rule would be okay to enable, but we cannot enable it due to the bug described above.
+
+# IDE0083: "Use pattern matching (not operator)"
+dotnet_diagnostic.IDE0083.severity = warning
+
+	csharp_style_prefer_not_pattern = true
+
+# IDE0084: "Use pattern matching (IsNot operator)"
+# Note: This is a Visual Basic-only rule, and we do not care at all about Visual Basic.
+# dotnet_diagnostic.IDE0084.severity = warning
+
+# IDE0090: "Simplify `new` expression"
+#          a.k.a. "'new' expression can be simplified"
+#          a.k.a. "implicit object creation"
+#          a.k.a. "target-typed `new`"
+# Also see IDE0008: "Use explicit type instead of 'var'"
+dotnet_diagnostic.IDE0090.severity = warning
+
+	csharp_style_implicit_object_creation_when_type_is_apparent = true
+
+# IDE0100: "Remove unnecessary equality operator" a.k.a. "Remove redundant equality"
+# This rule is configured differently between production code and test code.
+
+# IDE0110: "Remove unnecessary discard"
+dotnet_diagnostic.IDE0110.severity = warning
+
+# IDE0120: "Simplify LINQ expression"
+dotnet_diagnostic.IDE0120.severity = silent
+# Justification: 
+#    - I like functions that do only one thing. 
+#    - I assign no significance at all to the performance overhead of the additional method call per iteration. 
+#    - I like writing `Where(...).FirstOrDefault()`, `Where(...).Count()`, etc. 
+#    - I find that the termination method overloads that duplicate the functionality of `Where()` have no real reason
+#      to exist.
+
+# IDE0130: "Namespace does not match folder structure"
+# PEARL: If the severity of IDE0130 is 'warning', then `dotnet format style` will crash.
+#        This has been discussed here:
+#          > Github - dotnet/format - issue #1623
+#          > Unhandled exception in call to Workspace.TryApplyChanges
+#          > https://github.com/dotnet/format/issues/1623
+#        ...and nothing has been done about it for years.
+dotnet_diagnostic.IDE0130.severity = warning
+
+	dotnet_style_namespace_match_folder = true
+
+# IDE0140: "Simplify object creation"
+# Note: This is a Visual Basic-only rule, and we do not care at all about Visual Basic.
+# dotnet_diagnostic.IDE0140.severity = none
+
+# IDE0150: "Prefer 'null' check over type check"
+dotnet_diagnostic.IDE0150.severity = warning
+
+	csharp_style_prefer_null_check_over_type_check = true
+
+# IDE0160: "Use block-scoped namespace"
+# See also IDE0161: "Convert to file-scoped namespace"
+dotnet_diagnostic.IDE0160.severity = none
+
+	# Options: See IDE0161
+
+# IDE0161: "Convert to file-scoped namespace"
+# See also IDE0160: "Use block-scoped namespace"
+dotnet_diagnostic.IDE0161.severity = warning
+
+	# PEARL: This option controls both IDE0160 and IDE0161
+	# Possible values: `block_scoped`, `file_scoped`.  Default = `block_scoped`.
+	csharp_style_namespace_declarations = file_scoped
+
+# IDE0170: "Simplify property pattern"
+dotnet_diagnostic.IDE0170.severity = warning
+
+	csharp_style_prefer_extended_property_pattern = true
+
+# IDE0180: "Use tuple to swap values"
+dotnet_diagnostic.IDE0180.severity = warning
+
+	csharp_style_prefer_tuple_swap = true
+
+# IDE0200: "Remove unnecessary lambda expression" (Applicable languages: C# 11+)
+dotnet_diagnostic.IDE0200.severity = warning
+
+	csharp_style_prefer_method_group_conversion = true
+
+# IDE0210: "Convert to top-level statements"
+dotnet_diagnostic.IDE0210.severity = none
+# Justification: Top-level code statements are for script kiddies. The use of `Main()` is fine.
+
+	# Options: see IDE0211
+
+# IDE0211: "Convert to 'Program.Main' style program"
+dotnet_diagnostic.IDE0211.severity = warning
+# Justification: Top-level code statements are for script kiddies. Use a proper `Main()` instead.
+
+	# PEARL: this option controls both IDE0210 and IDE0211
+	csharp_style_prefer_top_level_statements = false
+
+# IDE0220: "Add explicit cast in foreach loop"
+dotnet_diagnostic.IDE0220.severity = warning
+
+	# Valid values: `always` and `when_strongly_typed`. Default is `when_strongly_typed`.
+	# PEARL: The name of this option and the names of its values are all brain-damaged. (TODO: explain)
+	dotnet_style_prefer_foreach_explicit_cast_in_source = when_strongly_typed
+
+# IDE0230: "Use UTF-8 string literal"
+dotnet_diagnostic.IDE0230.severity = warning
+
+	csharp_style_prefer_utf8_string_literals = true
+
+# IDE0240: "Nullable directive is redundant"
+dotnet_diagnostic.IDE0240.severity = warning
+
+# IDE0241: "Nullable directive is unnecessary"
+dotnet_diagnostic.IDE0241.severity = warning
+
+# IDE0250: "Struct can be made 'readonly'"
+dotnet_diagnostic.IDE0250.severity = warning
+
+	csharp_style_prefer_readonly_struct = true
+
+# IDE0251: "Member can be made 'readonly'"
+# PEARL: if IDE0251 is given a severity of 'warning', then `dotnet format` will insert `readonly` modifiers in various
+#        methods, and in doing so it will mess-up the modifier order specified elsewhere in editorconfig.
+dotnet_diagnostic.IDE0251.severity = suggestion
+
+	csharp_style_prefer_readonly_struct_member = true
+
+# IDE0260: "Use pattern matching"
+# Also see IDE0019: "Use pattern matching to avoid 'as' followed by a 'null' check"
+# Also see IDE0078: "Use pattern matching"
+# PEARL: This diagnostic has the same name as IDE0078: "Use pattern matching"
+dotnet_diagnostic.IDE0260.severity = warning
+
+	# Options: See IDE0019 
+
+# IDE0270: "Null check can be simplified (if null check)"
+# See also IDE0029: "Null check can be simplified (ternary conditional check)"
+# See also IDE0030: "Null check can be simplified (nullable ternary conditional check)"
+dotnet_diagnostic.IDE0270.severity = warning
+
+	# Options: See IDE0029
+
+# IDE0280: "Use 'nameof'"
+dotnet_diagnostic.IDE0280.severity = warning
+
+# IDE0290: "Use primary constructor"
+dotnet_diagnostic.IDE0290.severity = silent
+
+    csharp_style_prefer_primary_constructors = true
+
+# PEARL: collection expressions create types that cannot be found with 'search for type'.
+# PEARL: collection expressions create defective types that do not properly implement `Equals()` and `GetHashCode()`.
+# PEARL: the following rules can be used to suggest the use of collection expressions but not to prohibit their use.
+# PEARL: `dotnet_style_prefer_collection_expression` somehow controls all of the following: IDE0300, IDE0301, IDE0302,
+#        IDE0303, IDE0304, and IDE0305.
+# Possible values:
+#    - true | when_types_exactly_match -> Prefer collection expressions only when types match exactly, for example,
+#                                         int[] i = Array.Empty<int>();.
+#    - when_types_loosely_match        -> (NET 9+) Prefer to use collection expressions even when types match loosely,
+#                                         for example, IEnumerable<int> i = Array.Empty<int>();. The targeted type must
+#                                         match the type on the right-hand side or be one of the following types:
+#                                         IEnumerable<T>, ICollection<T>, IList<T>, IReadOnlyCollection<T>,
+#                                         IReadOnlyList<T>.
+#    - false | never                   -> Disables the rule.
+dotnet_style_prefer_collection_expression = never
+
+# IDE0300: "Use collection expression for array" (C# 12+)
+dotnet_diagnostic.IDE0300.severity = error
+
+# IDE0301: "Use collection expression for empty" (C# 12+)
+dotnet_diagnostic.IDE0301.severity = error
+
+# IDE0302: "Use collection expression for stackalloc" (C# 12+)
+dotnet_diagnostic.IDE0302.severity = error
+
+# IDE0303: "Use collection expression for Create()" (C# 12+)
+dotnet_diagnostic.IDE0303.severity = error
+
+# IDE0304: "Use collection expression for builder" (C# 12+)
+dotnet_diagnostic.IDE0304.severity = error
+
+# IDE0305: "Use collection expression for fluent" (C# 12+)
+dotnet_diagnostic.IDE0305.severity = error
+
+# IDE1005: "Use conditional delegate call"
+dotnet_diagnostic.IDE1005.severity = warning
+
+	# PEARL: there seems to be no rule to detect superfluous use of conditional delegate call. (Use of a conditional
+	#        delegate call on a non-nullable delegate.)
+	csharp_style_conditional_delegate_call = true
+
+# IDE1006: "Naming rule violation"
+# PEARL: the severity specified here seems to take precedence over the severity specified in each individual rule!
+# PEARL: When the severity of IDE1006 is `warning`, the command `dotnet format style` will issue the following message:
+#          > Unable to fix IDE1006. Code fix NamingStyleCodeFixProvider doesn't support Fix All in Solution.
+dotnet_diagnostic.IDE1006.severity = warning
+
+# General syntax for defining naming rules:
+#
+# dotnet_naming_style.<StyleName>.capitalization = one of: pascal_case, camel_case, first_word_upper, all_upper, all_lower
+# dotnet_naming_style.<StyleName>.required_prefix = <string>
+# dotnet_naming_style.<StyleName>.required_suffix = <string>
+# dotnet_naming_style.<StyleName>.word_separator = <string>
+#
+# dotnet_naming_symbols.<SymbolsName>.applicable_kinds = one of: *, namespace, class, struct, interface, enum, property, method, field, event, delegate, parameter, type_parameter, local, local_function
+# dotnet_naming_symbols.<SymbolsName>.applicable_accessibilities = one of: *, public, internal or friend, private, protected, protected_internal or protected_friend, private_protected, local
+# dotnet_naming_symbols.<SymbolsName>.required_modifiers = one of: abstract or must_inherit, async, const, readonly, static or shared
+#
+# dotnet_naming_rule.<RuleName>.style = <StyleName>
+# dotnet_naming_rule.<RuleName>.symbols = <SymbolsName>
+# dotnet_naming_rule.<RuleName>.severity = one of: error, warning, suggestion, silent, none, default
+#
+# NOTE: You must specify a capitalization style as part of your naming style, otherwise your naming style might be ignored.
+
+# "PascalCase" naming style
+dotnet_naming_style.pascal_case_style.capitalization                  = pascal_case
+dotnet_naming_style.pascal_case_style.word_separator                  =
+
+# "camelCase" naming style
+dotnet_naming_style.camel_case_style.capitalization                   = camel_case
+dotnet_naming_style.camel_case_style.word_separator                   =
+
+# Private symbols
+dotnet_naming_symbols.private_symbols.applicable_kinds                = property, method, field, event
+dotnet_naming_symbols.private_symbols.applicable_accessibilities      = private
+
+# Local symbols
+dotnet_naming_symbols.local_symbols.applicable_kinds                  = parameter, local, local_function
+dotnet_naming_symbols.local_symbols.applicable_accessibilities        = *
+
+# Non-private symbols
+dotnet_naming_symbols.non_private_symbols.applicable_kinds            = property, method, field, event
+dotnet_naming_symbols.non_private_symbols.applicable_accessibilities  = public, protected, internal
+
+# Private members rule
+# PEARL: if you set the severity of this one to error, it is still reported as a warning
+dotnet_naming_rule.private_members_should_be_camel_case.severity      = error
+dotnet_naming_rule.private_members_should_be_camel_case.symbols       = private_symbols
+dotnet_naming_rule.private_members_should_be_camel_case.style         = camel_case_style
+
+# Local variables rule
+# PEARL: if you set the severity of this one to error, then EVERYTHING is reported as an error.
+dotnet_naming_rule.local_variables_should_be_camel_case.severity      = warning
+dotnet_naming_rule.local_variables_should_be_camel_case.symbols       = local_symbols
+dotnet_naming_rule.local_variables_should_be_camel_case.style         = camel_case_style
+
+# Non-private members rule
+# PEARL: if you set the severity of this one to error, it is still reported as a warning.
+dotnet_naming_rule.non_private_members_should_be_pascal_case.severity = error
+dotnet_naming_rule.non_private_members_should_be_pascal_case.symbols  = non_private_symbols
+dotnet_naming_rule.non_private_members_should_be_pascal_case.style    = pascal_case_style
+
+# IDE1007: Undocumented
+# According to rumors, this used to be produced on already-error scenarios, to help the IDE to trigger features such as
+# 'generate type'. It has probably been removed by now.
+dotnet_diagnostic.IDE1007.severity = warning
+
+# IDE2000: "Allow multiple blank lines"
+# PEARL: Undocumented
+# PEARL: `dotnet format whitespace` will not fix this.
+dotnet_diagnostic.IDE2000.severity = warning
+
+	dotnet_style_allow_multiple_blank_lines_experimental = false
+
+# IDE2001: "Allow embedded statements on same line"
+# PEARL: Undocumented
+dotnet_diagnostic.IDE2001.severity = warning
+
+	csharp_style_allow_embedded_statements_on_same_line_experimental = false
+
+# IDE2002: "Allow blank lines between consecutive braces"
+# PEARL: Undocumented
+dotnet_diagnostic.IDE2002.severity = warning
+
+	csharp_style_allow_blank_lines_between_consecutive_braces_experimental = false
+
+# IDE2003: "Allow statement immediately after block"
+# PEARL: Undocumented
+dotnet_diagnostic.IDE2003.severity = none
+
+	dotnet_style_allow_statement_immediately_after_block_experimental = true
+
+# IDE2004: "Allow blank line after colon in constructor initializer"
+# PEARL: Undocumented
+dotnet_diagnostic.IDE2004.severity = warning
+
+	csharp_style_allow_blank_line_after_colon_in_constructor_initializer_experimental = false
+
+# IDE2005: "Allow blank line after token in conditional expression"
+# PEARL: Undocumented
+dotnet_diagnostic.IDE2005.severity = warning
+
+	csharp_style_allow_blank_line_after_token_in_conditional_expression_experimental = false
+
+# IDE2006: "Allow blank line after token in arrow expression"
+# PEARL: Undocumented
+# PEARL: Note that the word 'clause' is present in the editorconfig option but not in the title.
+dotnet_diagnostic.IDE2006.severity = warning
+
+	csharp_style_allow_blank_line_after_token_in_arrow_expression_clause_experimental = false
+
+#######################################################################################################################
+# Editorconfig options without corresponding dotnet diagnostics
+# PEARL: yep, of course there were bound to be some of those, too.
+
+# Valid values: end_of_line, beginning_of_line (the default)
+dotnet_style_operator_placement_when_wrapping = beginning_of_line
+
+#######################################################################################################################
+# Dotnet diagnostics (CAxxxx)
+
+# dotnet_analyzer_diagnostic.severity = error
+# dotnet_analyzer_diagnostic.category-Design.severity = error
+# dotnet_analyzer_diagnostic.category-Documentation.severity = error
+# dotnet_analyzer_diagnostic.category-Globalization.severity = error
+# dotnet_analyzer_diagnostic.category-Interoperability.severity = error
+# dotnet_analyzer_diagnostic.category-Maintainability.severity = error
+# dotnet_analyzer_diagnostic.category-Naming.severity = error
+# dotnet_analyzer_diagnostic.category-Performance.severity = error
+# dotnet_analyzer_diagnostic.category-SingleFile.severity = error
+# dotnet_analyzer_diagnostic.category-Reliability.severity = error
+# dotnet_analyzer_diagnostic.category-Security.severity = error
+# dotnet_analyzer_diagnostic.category-Style.severity = error
+# dotnet_analyzer_diagnostic.category-Usage.severity = error
+
+# PEARL: Supposedly, this actually controls IDE0051: "Remove unused private member", IDE0064: "Make struct fields
+#        writable" and IDE0076: "Remove invalid global 'SuppressMessageAttribute'".
+# dotnet_analyzer_diagnostic.category-CodeQuality.severity = warning
+
+# "API surface" for dotnet_code_quality
+# Allowed values (separated by commas)
+#  - public (applies to public and protected APIs)
+#  - internal or friend (applies to internal and private protected APIs)
+#  - private (applies to private APIs)
+#  - all (applies to all APIs)
+# The default is `public`, we want `all`.
+dotnet_code_quality.api_surface = all
+
+# CA1000: "Do not declare static members on generic types"
+dotnet_diagnostic.CA1000.severity = none
+# Justification: The justification given by the documentation for this rule is utterly unconvincing.
+#    Static members on generic types are fine.
+
+# CA1001: "Types that own disposable fields should be disposable"
+# TODO: Good to have; should turn into a warning.
+dotnet_diagnostic.CA1001.severity = suggestion
+
+# CA1002: Do not expose generic lists
+#         a.k.a. Change 'List<{0}>' in '{1}' to use 'Collection<T>', 'ReadOnlyCollection<T>' or 'KeyedCollection<K,V>'.
+# PEARL: Ideally we would want to have this rule, to point out improper use of `List<T>`; however, the rule points out
+#        improper use of `List<T>` and then proceeds to suggest some collections as replacements for `List<>`, but they
+#        are all unsuitable. The one replacement which is suitable is not listed, and it is `IList<T>`. Therefore, we
+#        have to disable this rule in order to prevent programmers from blindly following it and creating a mess.
+dotnet_diagnostic.CA1002.severity = none
+
+	# PEARL: If we use "dotnet_code_quality.api_surface = all", the api-surface of this rule will be affected too. Thus,
+	#        even though this rule is about not "exposing" generic lists, it will start complaining about all generic
+	#        list fields, even private ones, which are by definition not "exposed".
+	#        We fix that by setting the api-surface of this rule back to `public`.
+	dotnet_code_quality.CA1002.api_surface = public
+
+# CA1003: "Use generic event handler instances"
+# PEARL: The word 'generic' here is not used in the sense of parametric polymorphism; it is used in the sense of "one
+#        type fits all", and the type that fits all is `EventArgs`.
+dotnet_diagnostic.CA1003.severity = none
+# Justification: This is absolutely retarded. Do _not_ use EventArgs; use custom event handlers instead.
+
+# CA1004: Undocumented/Nonexistent
+
+# CA1005: "Avoid excessive parameters on generic types"
+dotnet_diagnostic.CA1005.severity = none
+# Justification: Our generic types will have as many parameters as we want them to.
+
+# CA1006: Undocumented/Nonexistent
+# CA1007: Undocumented/Nonexistent
+
+# CA1008: "Enums should have zero value"
+dotnet_diagnostic.CA1008.severity = warning
+
+# CA1009: Undocumented/Nonexistent
+
+# CA1010: "Collections should implement generic interface"
+dotnet_diagnostic.CA1010.severity = warning
+
+# CA1011: Undocumented/Nonexistent
+
+# CA1012: "Abstract types should not have constructors"
+# TODO: Good to have; should turn into a warning.
+dotnet_diagnostic.CA1012.severity = suggestion
+
+# CA1013: Undocumented/Nonexistent
+
+# CA1014: "Mark assemblies with CLSCompliant"
+dotnet_diagnostic.CA1014.severity = none
+# Justification: This warning aims to ensure that an assembly can be invoked from other CLR languages, like Visual
+#    Basic, but we do not care about other CLR languages, and we especially do not care about Visual Basic.
+
+# CA1015: Undocumented/Nonexistent
+
+# CA1016: "Mark assemblies with assembly version"
+dotnet_diagnostic.CA1016.severity = none
+# Justification: #AintNoBodyGotNoTimeFoDat.
+
+# CA1017: "Mark assemblies with ComVisible"
+dotnet_diagnostic.CA1017.severity = warning
+# Justification: We do not care at all about "COM".
+
+# CA1018: "Mark attributes with AttributeUsageAttribute"
+dotnet_diagnostic.CA1018.severity = warning
+
+# CA1019: "Define accessors for attribute arguments"
+dotnet_diagnostic.CA1019.severity = warning
+
+# CA1020: Undocumented/Nonexistent
+
+# CA1021: "Avoid `out` parameters"
+# PEARL: The long message for this rule is "Avoid 'out' parameters as they are not designed for general audience", which
+#        is trying to imply that there was some design worth speaking of, and that different audiences were considered.
+#        That's all mythology. What they meant to say is:
+#        "Avoid 'out' parameters as it turns out that they were a bad idea afterall".
+dotnet_diagnostic.CA1021.severity = warning
+
+# CA1022: Undocumented/Nonexistent
+# CA1023: Undocumented/Nonexistent
+
+# CA1024: "Use properties where appropriate"
+dotnet_diagnostic.CA1024.severity = silent
+
+# CA1025: Undocumented/Nonexistent
+# CA1026: Undocumented/Nonexistent
+
+# CA1027: "Mark enums with FlagsAttribute"
+dotnet_diagnostic.CA1027.severity = warning
+
+# CA1028: "Enum Storage should be Int32"
+dotnet_diagnostic.CA1028.severity = warning
+
+# CA1029: Undocumented/Nonexistent
+
+# CA1030: "Use events where appropriate"
+dotnet_diagnostic.CA1030.severity = warning
+
+# CA1031: "Do not catch general exception types"
+dotnet_diagnostic.CA1031.severity = none
+# Justification: I know what I am doing, thank you.
+
+# CA1032: "Implement standard exception constructors"
+dotnet_diagnostic.CA1032.severity = none
+# Justification: Standard exception constructors are ill-conceived. Each exception should have a very narrow purpose,
+#    and a very specific set of parameters to facilitate this purpose and nothing but this purpose.
+#    Standard exception constructors are meant to facilitate general-purpose use, and we specifically do not want this.
+
+# CA1033: "Interface methods should be callable by child types"
+dotnet_diagnostic.CA1033.severity = warning
+
+# CA1034: "Nested types should not be visible"
+dotnet_diagnostic.CA1034.severity = none
+# Justification: The documentation justifies this by saying "Nested types include the notion of member accessibility,
+#    which some programmers do not understand clearly."
+#    Programmers who do not clearly understand the notion of member accessibility should be milking goats instead of
+#    trying to program.
+
+# CA1035: Undocumented/Nonexistent
+
+# CA1036: "Override methods on comparable types"
+dotnet_diagnostic.CA1036.severity = none
+# Justification: This rule is saying that if I invest the effort to make a class implement IComparable, that's not
+#    enough, I must then invest considerable additional effort to implement operators ==, !=, <, <=, >, and >=.
+#    What kind of idiot comes up with these rules? #AintNoBodyGotNoTimeFoDat
+
+# CA1040: "Avoid empty interfaces"
+dotnet_diagnostic.CA1040.severity = warning
+
+# CA1041: "Provide ObsoleteAttribute message"
+dotnet_diagnostic.CA1041.severity = none
+# Justification: #AintNoBodyGotNoTimeFoDat
+
+# CA1043: "Use Integral Or String Argument For Indexers"
+dotnet_diagnostic.CA1043.severity = none
+# Justification: This is a retarded rule conceived by retarded people and intended for retarded people.
+
+# CA1044: "Properties should not be write only"
+dotnet_diagnostic.CA1044.severity = warning
+
+# CA1045: "Do not pass types by reference"
+#         a.k.a. "Consider a design that does not require that '{0}' be a reference parameter"
+# PEARL: This rule does not refrain from checking `extern` functions, so it will flag all Win32 functions that have
+#        ref struct parameters, and are, of course, beyond my control to reconsider their design.
+# PEARL: The documentation for this rule says:
+#            "Passing types by reference (using `out` or `ref`) requires experience with pointers, understanding how
+#             value types and reference types differ, and handling methods that have multiple return values. Also, the
+#             difference between out and ref parameters is not widely understood."
+#        Most of this is nonsense. If a programmer does not understand pointers, or how value types and reference types
+#        differ, or the difference between out and ref parameters, they should not be trying to program, they should be
+#        milking goats.
+#        The only part that describes a real problem is the "methods that have multiple return values" part. `ref` and
+#        `out` are not functional constructs, and as such they are messy to work with.
+dotnet_diagnostic.CA1045.severity = warning
+
+# CA1046: "Do not overload operator equals on reference types"
+dotnet_diagnostic.CA1046.severity = warning
+
+# CA1047: "Do not declare protected members in sealed types"
+dotnet_diagnostic.CA1047.severity = warning
+
+# CA1050: "Declare types in namespaces"
+dotnet_diagnostic.CA1050.severity = warning
+
+# CA1051: "Do not declare visible instance fields"
+# PEARL: This code analysis rule caters to the common misconception that visible instance fields are somehow a bad thing
+#    to have. In fact, they are perfectly fine, as long as they are readonly, but this rule prohibits all visible
+#    instance fields indiscriminately.
+#    The only scenario under which readonly visible instance fields are problematic is when building a library for third
+#    parties to use. In that and only that case it is beneficial to encapsulate instance fields via properties, so that
+#    the implementation can change without breaking binary compatibility with code that uses it.
+# PEARL: One might think that CA2211 "Non-constant fields should not be visible" can be used instead, but it cannot,
+#    because it only checks static fields, not instance fields.
+dotnet_diagnostic.CA1051.severity = warning
+# Justification: due to the retarded way CA2211 works, we have no option but to enable CA1051, which means that we
+#    cannot have any visible instance fields even if they are readonly.
+
+# CA1052: "Static holder types should be Static or NotInheritable"
+# TODO: Good to have; should turn into a warning.
+dotnet_diagnostic.CA1052.severity = suggestion
+
+# CA1053: "Static holder types should not have default constructors"
+dotnet_diagnostic.CA1053.severity = warning
+
+# CA1054: "Uri parameters should not be strings"
+dotnet_diagnostic.CA1054.severity = warning
+
+# CA1055: "Uri return values should not be strings"
+dotnet_diagnostic.CA1055.severity = warning
+
+# CA1056: "Uri properties should not be strings"
+dotnet_diagnostic.CA1056.severity = warning
+
+# CA1058: "Types should not extend certain base types"
+dotnet_diagnostic.CA1058.severity = warning
+
+# CA1060: "Move pinvokes to native methods class"
+# PEARL: This rule is not content with the native methods being declared as internal in a static internal class;
+#        it also requires the name of the class to be "NativeMethods".  
+# PEARL: Visual Studio has a ridiculous bug where the debugger shows the wrong class if there are multiple classes with
+#        the same name in the solution, despite them being in different namespaces.
+#        This means that if all native methods in all namespaces are placed in classes called "NativeMethods" the
+#        debugger will always be confused.
+dotnet_diagnostic.CA1060.severity = none
+# Justification: The combination of the two PEARLs above means that following this rule is bound to cause problems.
+
+# CA1061: "Do not hide base class methods"
+# TODO I am not sure about this
+dotnet_diagnostic.CA1061.severity = warning
+
+# CA1062: "Validate arguments of public methods"
+# PEARL: This rule is not about just any validation, it is specifically about checking against `null`. 
+dotnet_diagnostic.CA1062.severity = none
+# Justification: This rule has largely been rendered obsolete since explicit nullability was introduced to the language.
+#    Essentially, with explict nullability in place, this rule is telling us to check arguments against null in case
+#    someone somehow manages to pass `null` despite the parameter having been declared as non-nullable.
+#    The chances of this happening are too slim to justify the effort of checking against it.
+
+# CA1063: "Implement IDisposable Correctly"
+dotnet_diagnostic.CA1063.severity = none
+# Justification: What Microsoft (and the vast majority of the dotnet world) thinks of as "correctly" is retarded.
+#    Do not implement IDisposable the way Microsoft suggests.
+#    Use a 'LifeGuard' instead.
+#    See michael.gr - Mandatory disposal vs. the "Dispose-disposing" abomination
+#    https://blog.michael.gr/2015/03/on-dispose-bool-disposing-abomination.html
+
+# CA1064: "Exceptions should be public"
+dotnet_diagnostic.CA1064.severity = warning
+
+# CA1065: "Do not raise exceptions in unexpected locations"
+dotnet_diagnostic.CA1065.severity = none
+# Justification: The documentation says that this is not cool, but then it says that it is okay for certain predefined
+#    classes of exceptions.
+#    Thus, in order to satisfy this rule, our exceptions would have to be shoe-horned to derive from one of those
+#    predefined classes, and #AintNoBodyGotNoTimeFoDat.
+
+# CA1066: "Type {0} should implement IEquatable<T> because it overrides Equals"
+# TODO: Good to have; should turn into a warning.
+dotnet_diagnostic.CA1066.severity = suggestion
+
+# CA1067: "Override Object.Equals(object) when implementing IEquatable<T>"
+dotnet_diagnostic.CA1067.severity = warning
+
+# CA1068: "CancellationToken parameters must come last"
+dotnet_diagnostic.CA1068.severity = warning
+
+# CA1069: "Enums should not have duplicate values"
+dotnet_diagnostic.CA1069.severity = warning
+
+# CA1070: "Do not declare event fields as virtual"
+# PEARL: According to the documentation:
+#            "Do not declare virtual events in a base class. Overridden events in a derived class have undefined
+#             behavior. The C# compiler does not handle this correctly and it is unpredictable whether a subscriber to
+#             the derived event will actually be subscribing to the base class event."
+dotnet_diagnostic.CA1070.severity = warning
+
+# CA1200: "Avoid using cref tags with a prefix"
+dotnet_diagnostic.CA1200.severity = warning
+
+# CA1303: "Do not pass literals as localized parameters"
+dotnet_diagnostic.CA1303.severity = none
+# Justification: We do not do localization.
+
+# CA1304: "Specify CultureInfo"
+dotnet_diagnostic.CA1304.severity = warning
+
+# CA1305: "Specify IFormatProvider"
+#         a.k.a. "The behavior of '{0}' could vary based on the current user's locale settings. Replace[bla bla...]"
+# PEARL: This rule does not give you a clear idea what to do to fix it, and Visual Studio is so woefully inadequate that
+#        it does not offer any quick fixes. The quick fix usually is to simply to add a `CultureInfo.InvariantCulture`
+#        parameter, which, you might never guess from its name, but it is actually an `IFormatProvider`.
+dotnet_diagnostic.CA1305.severity = warning
+
+# CA1307: "Specify StringComparison for clarity"
+dotnet_diagnostic.CA1307.severity = warning
+
+# CA1308: "Normalize strings to uppercase"
+dotnet_diagnostic.CA1308.severity = warning
+
+# CA1309: "Use ordinal StringComparison"
+dotnet_diagnostic.CA1309.severity = warning
+
+# CA1310: "Specify StringComparison for correctness"
+dotnet_diagnostic.CA1310.severity = warning
+
+# CA1311: "Specify a culture or use an invariant version"
+dotnet_diagnostic.CA1311.severity = warning
+
+# CA2101: "Specify marshalling for P/Invoke string arguments"
+dotnet_diagnostic.CA2101.severity = warning
+
+# CA1401: "P/Invokes should not be visible"
+dotnet_diagnostic.CA1401.severity = warning
+
+# CA1416: "Validate platform compatibility"
+dotnet_diagnostic.CA1416.severity = warning
+
+# CA1417: "Do not use OutAttribute on string parameters for P/Invokes"
+dotnet_diagnostic.CA1417.severity = warning
+
+# CA1418: "Validate platform compatibility"
+dotnet_diagnostic.CA1418.severity = warning
+
+# CA1419: "Provide a parameterless constructor that is as visible as the containing type for concrete types derived from
+#          'System.Runtime.InteropServices.SafeHandle'"
+dotnet_diagnostic.CA1419.severity = warning
+
+# CA1420: "Property, type, or attribute requires runtime marshalling"
+dotnet_diagnostic.CA1420.severity = warning
+
+# CA1421: "Method uses runtime marshalling when DisableRuntimeMarshallingAttribute is applied"
+dotnet_diagnostic.CA1421.severity = warning
+
+# CA1422: "Validate platform compatibility - obsoleted APIs"
+dotnet_diagnostic.CA1422.severity = warning
+
+# CA1501: "Avoid excessive inheritance"
+dotnet_diagnostic.CA1501.severity = warning
+
+# CA1502: "Avoid excessive complexity"
+#         a.k.a. "'<method>' has a cyclomatic complexity of '<number>'. Rewrite or refactor the code [bla bla...]"
+# PEARL: This rule considers static nested methods as adding to the complexity of a method, which is an entirely
+#        unwarranted thing to do. In fact, static nested methods are the ideal means of reducing the complexity
+#        of a method.
+dotnet_diagnostic.CA1502.severity = none
+# Justification: Ideally, such a rule would be useful to have; however, abiding by this rule would essentially require
+#    us to convert static nested methods into non-nested methods, which would represent a reduction in code quality.
+#    Therefore, this rule is junk.
+
+# CA1505: "Avoid unmaintainable code"
+dotnet_diagnostic.CA1505.severity = warning
+
+# CA1506: "Avoid excessive class coupling"
+dotnet_diagnostic.CA1506.severity = warning
+
+# CA1507: "Use nameof to express symbol names"
+dotnet_diagnostic.CA1507.severity = warning
+
+# CA1508: "Avoid dead conditional code"
+# TODO: Good to have; should turn into a warning.
+dotnet_diagnostic.CA1508.severity = suggestion
+
+# CA1509: "Invalid entry in code metrics rule specification file"
+# TODO: Need to research what this "code metrics rule specification file" is.
+dotnet_diagnostic.CA1509.severity = warning
+
+# CA1510: "Use ArgumentNullException throw helper"
+dotnet_diagnostic.CA1510.severity = warning
+
+# CA1511: "Use ArgumentException throw helper"
+dotnet_diagnostic.CA1511.severity = warning
+
+# CA1512: "Use ArgumentOutOfRangeException throw helper"
+dotnet_diagnostic.CA1512.severity = warning
+
+# CA1513: "Use ObjectDisposedException throw helper"
+dotnet_diagnostic.CA1513.severity = warning
+
+# CA1514: "Avoid redundant length argument"
+dotnet_diagnostic.CA1514.severity = warning
+
+# CA1515: "Consider making public types internal"
+# This rule is configured differently between production projects and test projects.
+
+# CA1700: "Do not name enum values 'Reserved'"
+dotnet_diagnostic.CA1700.severity = warning
+
+# CA1707: "Identifiers should not contain underscores"
+# This rule is configured differently between production code and test code.
+
+# CA1708: "Identifiers should differ by more than case"
+# PEARL: As of Visual Studio 17.7.6, the message displayed by MSBuild for CA1708 is bugged.
+dotnet_diagnostic.CA1708.severity = none
+# Justification: Public members should be PascalCase, private members should be camelCase, we often see a public member
+#    which is very closely associated with a corresponding private member, and it is perfectly fine for those
+#    two members to have names which are identical except for case.
+
+# CA1710: "Identifiers should have correct suffix"
+dotnet_diagnostic.CA1710.severity = none
+# Justification: What kind of idiot comes up with these rules?
+
+# CA1711: "Identifiers should not have incorrect suffix"
+dotnet_diagnostic.CA1711.severity = none
+# Justification: What kind of idiot comes up with these rules?
+
+# CA1712: "Do not prefix enum values with type name"
+dotnet_diagnostic.CA1712.severity = warning
+
+# CA1713: "Events should not have before or after prefix"
+dotnet_diagnostic.CA1713.severity = warning
+
+# CA1714: "Flags enums should have plural names"
+dotnet_diagnostic.CA1714.severity = warning
+
+# CA1715: "Identifiers should have correct prefix" / "Prefix interface <> with 'I'"
+dotnet_diagnostic.CA1715.severity = none
+# Justification: Prefixing interfaces with 'I' is an example of hungarian notation, and we do not do hungarian notation.
+
+# CA1716: "Identifiers should not match keywords"
+dotnet_diagnostic.CA1716.severity = none
+# Justification: This rule exists for the benefit of programmers writing code in other CLR languages, and we do not care
+# about other CLR languages.
+
+# CA1717: "Only FlagsAttribute enums should have plural names"
+dotnet_diagnostic.CA1717.severity = warning
+
+# CA1720: "Identifier contains type name"
+dotnet_diagnostic.CA1720.severity = none
+# Justification: This would prevent an enum from containing values like "Short" and "Long". Therefore, this rule is junk.
+
+# CA1721: "Property names should not match get methods"
+#         a.k.a. "The property name 'Something' is confusing given the existence of method 'GetSomething'. Rename or 
+#         remove one of these members.
+dotnet_diagnostic.CA1721.severity = none
+# Justification: It is perfectly fine to have a property named `Something` and a method named `GetSomething`, as long
+#    as the method returns the exact same thing that the property returns. This is done, for example:
+#      - For convenience, since a method can be passed as-is where a delegate is expected, whereas a property cannot, 
+#        so a new lambda has to be created just in order to access the property.
+#      - As a workaround to the problem that an abstract get-only property cannot be overridden with a property that 
+#        also has a setter.
+
+# CA1724: "Type names should not match namespaces"
+dotnet_diagnostic.CA1724.severity = none
+# Justification: I can kind of understand why there may be a problem when talking about types and namespaces in the same
+#    ancestry line, but this stupid rule reports a conflcit between types and namespaces in completely unrelated
+#    ancestry lines, for example type `MyNameSpace.Schema` and namespace `System.Xml.Schema`, which is extremely
+#    narrow-minded because it disregards the very purpose of the very concept of namespaces.
+
+# CA1725: "Parameter names should match base declaration"
+dotnet_diagnostic.CA1725.severity = none
+# Justification: Following this rule would essentially mean repeating the same mistakes made by the author of the base
+#    declaration, which is usually Microsoft.
+
+# CA1727: "Use PascalCase for named placeholders"
+dotnet_diagnostic.CA1727.severity = warning
+
+# CA1801: "Review unused parameters"
+dotnet_diagnostic.CA1801.severity = warning
+
+# CA1802: "Use literals where appropriate"
+dotnet_diagnostic.CA1802.severity = suggestion
+
+# CA1804: "Remove unused locals"
+# PEARL: currently, this does not seem to be working! See https://github.com/dotnet/roslyn-analyzers/issues/7412
+dotnet_diagnostic.CA1804.severity = warning
+
+# CA1805: "Do not initialize unnecessarily" / "Member is explicitly initialized to its default value"
+dotnet_diagnostic.CA1805.severity = suggestion
+
+# CA1806: "Do not ignore method results"
+dotnet_diagnostic.CA1806.severity = warning
+
+# CA1811 "Avoid uncalled private code"
+# This rule appears to not exist anymore. (Or maybe it is not enabled because it belongs to some "Microsoft.Performance" ruleset which we are not using.)
+dotnet_diagnostic.CA1811.severity = warning
+
+# CA1812: "Avoid uninstantiated internal classes"
+dotnet_diagnostic.CA1812.severity = warning
+
+# CA1813: "Avoid unsealed attributes"
+dotnet_diagnostic.CA1813.severity = none
+# Justification: With C#11 generic attributes, we will want to use non-generic attributes as base classes for generic
+#    attributes, and these base classes will, of course, have to be unsealed in order to be derived.
+#    Furthermore, according to the documentation, this rule exists solely for the purpose of performance, but generally,
+#    what we care most about is correctness, not performance.
+
+# CA1814: "Prefer jagged arrays over multidimensional"
+dotnet_diagnostic.CA1814.severity = none
+# Justification: Are you completely out of your mind?
+
+# CA1815: "Override equals and operator equals on value types"
+# PEARL: This rule requires structs to implement Equals(), and gives some justification for that. So far, so good.
+#        However, it also requires structs to implement the `==` and `!=` operators, without providing any justification
+#        for that capriciousness.
+dotnet_diagnostic.CA1815.severity = silent
+# Justification: Ideally, we would want this rule to generate a warning, so as to require structs to implement Equals().
+#    However, we do not want to see this warning for every struct that lacks equality operators.
+
+# CA1816: "Call GC.SuppressFinalize correctly"
+#         a.k.a. "Change <class>.Dispose() to call GC.SuppressFinalize(object). This will prevent [bla bla...]"
+# PEARL: When a Dispose() method is flagged by this rule, what it usually means is that the containing class should
+#    simply be marked as sealed.
+#    So, the rule could hypothetically be beneficial.
+#    However, the rule issues a biased message which gives wrong instructions to the programmer as to what to do to fix
+#    the problem.
+#    Therefore, we have to disable this rule in order to prevent programmers from applying the suggested fixes.
+dotnet_diagnostic.CA1816.severity = none
+# Justification: What dotnet thinks of as "correctly" is retarded.
+#            Do _not_ invoke System.GC.SuppressFinalize() from within `.Dispose()`; instead, use a `Lifeguard`.
+
+# CA1819: "Properties should not return arrays"
+dotnet_diagnostic.CA1819.severity = warning
+
+# CA1820: Test for empty strings using string length
+# PEARL: This is retarded, because it is asking us to make code unnecessarily technical in order to (perhaps) save a
+#        couple of clock cycles. I would expect the JITter to take care of this, and if it does not, then this is
+#        dotnet's problem, not my problem.
+# PEARL: The quick fix for this rule does _**not**_ use string length; instead, it uses a call to
+#        `string.IsNullOrEmpty()`, which is _**doubly retarded**_.
+dotnet_diagnostic.CA1820.severity = none
+# Justification: See PEARL comments above.
+
+# CA1821: "Remove empty Finalizers"
+dotnet_diagnostic.CA1821.severity = warning
+
+# CA1822: "Mark members as static"
+dotnet_diagnostic.CA1822.severity = suggestion
+
+# CA1823: "Avoid unused private fields"
+dotnet_diagnostic.CA1823.severity = warning
+
+# CA1824: "Mark assemblies with NeutralResourcesLanguageAttribute"
+# PEARL: This rule only runs if <AnalysisLevel> is sufficiently high, just like all other analyzers; however, if it
+#        has something to report, it appears to be reported by the C# compiler, not by some analyzer, so unlike all
+#        other analysis rules, it is subject to "TreatWarningsAsErrors".
+dotnet_diagnostic.CA1824.severity = warning
+
+# CA1825: "Avoid zero-length array allocations"
+# TODO: Good to have; should turn into a warning.
+dotnet_diagnostic.CA1825.severity = suggestion
+
+# CA1826: "Use property instead of Linq Enumerable method"
+dotnet_diagnostic.CA1826.severity = warning
+
+# CA1827: "Do not use Count()/LongCount() when Any() can be used"
+# TODO: Good to have; should turn into a warning.
+dotnet_diagnostic.CA1827.severity = suggestion
+
+# CA1828: "Do not use CountAsync/LongCountAsync when AnyAsync can be used"
+dotnet_diagnostic.CA1828.severity = warning
+
+# CA1829: "Use Length/Count property instead of Enumerable.Count method"
+# TODO: Good to have; should turn into a warning.
+dotnet_diagnostic.CA1829.severity = suggestion
+
+# CA1830: "Prefer strongly-typed Append and Insert method overloads on StringBuilder"
+dotnet_diagnostic.CA1830.severity = warning
+
+# CA1831: "Use AsSpan instead of Range-based indexers for string when appropriate"
+dotnet_diagnostic.CA1831.severity = warning
+
+# CA1832: "Use AsSpan or AsMemory instead of Range-based indexers for getting ReadOnlySpan or ReadOnlyMemory portion of an array"
+dotnet_diagnostic.CA1832.severity = warning
+
+# CA1833: "Use AsSpan or AsMemory instead of Range-based indexers for getting Span or Memory portion of an array"
+dotnet_diagnostic.CA1833.severity = warning
+
+# CA1834: "Use StringBuilder.Append(char) for single character strings"
+#         a.k.a. "Use 'StringBuilder.Append(char)' instead of 'StringBuilder.Append(string)' when [bla bla...]"
+#         a.k.a. "Consider using 'StringBuilder.Append(char)' when applicable"
+dotnet_diagnostic.CA1834.severity = silent
+# Justification: #AintNoBodyGotNoTimeFoDat.
+
+# CA1835: "Prefer the memory-based overloads of ReadAsync/WriteAsync methods in stream-based classes"
+dotnet_diagnostic.CA1835.severity = warning
+
+# CA1836: "Prefer IsEmpty over Count when available"
+dotnet_diagnostic.CA1836.severity = warning
+
+# CA1837: "Use Environment.ProcessId instead of Process.GetCurrentProcess().Id"
+dotnet_diagnostic.CA1837.severity = warning
+
+# CA1838: "Avoid StringBuilder parameters for P/Invokes"
+dotnet_diagnostic.CA1838.severity = warning
+
+# CA1839: "Use Environment.ProcessPath instead of Process.GetCurrentProcess().MainModule.FileName"
+dotnet_diagnostic.CA1839.severity = warning
+
+# CA1840: "Use Environment.CurrentManagedThreadId instead of Thread.CurrentThread.ManagedThreadId"
+dotnet_diagnostic.CA1840.severity = warning
+
+# CA1841: "Prefer Dictionary Contains methods"
+dotnet_diagnostic.CA1841.severity = warning
+
+# CA1842: "Do not use 'WhenAll' with a single task"
+dotnet_diagnostic.CA1842.severity = warning
+
+# CA1843: "Do not use 'WaitAll' with a single task"
+dotnet_diagnostic.CA1843.severity = warning
+
+# CA1844: "Provide memory-based overrides of async methods when subclassing 'Stream'"
+dotnet_diagnostic.CA1844.severity = warning
+
+# CA1845: "Use span-based 'string.Concat'"
+dotnet_diagnostic.CA1845.severity = warning
+
+# CA1846: "Prefer AsSpan over Substring"
+# PEARL: The automatic fix for this rule adds `using System;` at the top of the file, without even respecting our
+#        'using directives inside namespace' setting. It is unacceptable to add `using System`, because we always
+#        alias `System` as `Sys`.
+#        We keep this rule as a suggestion so as to be reminded to replace Substring with index pattern.
+dotnet_diagnostic.CA1846.severity = suggestion
+
+# CA1847: "Use string.Contains(char) instead of string.Contains(string) with single characters"
+dotnet_diagnostic.CA1847.severity = warning
+
+# CA1848: "Use the LoggerMessage delegates"
+dotnet_diagnostic.CA1848.severity = warning
+
+# CA1849: "Call async methods when in an async method"
+dotnet_diagnostic.CA1849.severity = warning
+
+# CA1850: "Prefer static HashData method over ComputeHash"
+dotnet_diagnostic.CA1850.severity = warning
+
+# CA1851: "Possible multiple enumerations of IEnumerable collection"
+# TODO: Good to have; should turn into a warning.
+dotnet_diagnostic.CA1851.severity = suggestion
+
+# CA1852: "Seal internal types"
+dotnet_diagnostic.CA1852.severity = warning
+
+# CA1853: "Unnecessary call to 'Dictionary.ContainsKey(key)'"
+dotnet_diagnostic.CA1853.severity = warning
+
+# CA1854: "Prefer the IDictionary.TryGetValue(TKey, out TValue) method"
+dotnet_diagnostic.CA1854.severity = warning
+
+# CA1855: "Use Span<T>.Clear() instead of Span<T>.Fill()"
+dotnet_diagnostic.CA1855.severity = warning
+
+# CA1858: "Use StartsWith instead of IndexOf"
+dotnet_diagnostic.CA1858.severity = warning
+
+# CA1859: "Use concrete types when possible for improved performance"
+dotnet_diagnostic.CA1859.severity = none
+# Justification: This rule is trying to suggest how to write more performant code, which is nice, but it is recommending
+#    to suffer losses in abstraction and encapsulation in order to enjoy gains in performance. So, this rule is garbage.
+
+# CA1860: "Avoid using 'Enumerable.Any()' extension method"
+dotnet_diagnostic.CA1860.severity = warning
+
+# CA1861: "Avoid constant arrays as arguments"
+# PEARL: This rule is retarded. There is merit in _not_ passing arrays as arguments, but:
+#         - the rule suggests to replace them with `static readonly` fields, which is a terrible thing to do, because
+#           they are mutable.
+#         - the rule only flags arrays that consist of elements that are compile-time constants, which is unwarranted.
+#        If a function expects an array argument, (there should be no such function, but that is beyond our control,)
+#        then by all means do the opposite of what this rule suggests: construct an array on the fly and pass it.
+#        If the function expects an IEnumerable<>, then use EnumerableOf().
+#        We keep this warning, but only so as to be reminded to use EnumerableOf().
+dotnet_diagnostic.CA1861.severity = warning
+
+# CA1862: "Prefer using 'string.Equals(string, StringComparison)' to perform a case-insensitive comparison [bla bla...]
+# PEARL: Undocumented
+dotnet_diagnostic.CA1862.severity = warning
+
+# CA1864: "Prefer the 'IDictionary.TryAdd(TKey, TValue)' method"
+dotnet_diagnostic.CA1864.severity = warning
+
+# CA1865: "Use 'string.Method(char)' instead of 'string.Method(string)' for string with single char"
+dotnet_diagnostic.CA1865.severity = warning
+
+# CA1866: "Use 'string.Method(char)' instead of 'string.Method(string)' for string with single char"
+dotnet_diagnostic.CA1866.severity = warning
+
+# CA1867: "Use 'string.Method(char)' instead of 'string.Method(string)' for string with single char"
+dotnet_diagnostic.CA1867.severity = warning
+
+# CA1868: "Unnecessary call to 'Contains' for sets"
+dotnet_diagnostic.CA1868.severity = warning
+
+# CA1869: "Cache and reuse 'JsonSerializerOptions' instances"
+dotnet_diagnostic.CA1869.severity = warning
+
+# CA1870: "Use a cached 'SearchValues' instance"
+dotnet_diagnostic.CA1870.severity = warning
+
+# CA2000: "Dispose objects before losing scope"
+# PEARL: This warning is absolutely lame. The analysis done to figure out whether something is disposed or not is
+#        nowhere near adequate, so it results in a huge number of false positives even in trivial code.
+#        For custom-written IDisposable classes, use LifeGuards.
+#        For CLR-provided IDisposable classes, this diagnostic should periodically be temporarily enabled and its
+#        results should be checked in case they show that we have missed something. (Alternatively, never make direct
+#        use of any CLR-provided IDisposable classes; always wrap them in custom-written classes that use LifeGuards.)
+dotnet_diagnostic.CA2000.severity = none
+
+# CA2002: "Do not lock on objects with weak identity"
+# TODO: Good to have; should turn into a warning.
+dotnet_diagnostic.CA2002.severity = suggestion
+
+# CA2007: "Consider calling ConfigureAwait on the awaited task"
+dotnet_diagnostic.CA2007.severity = warning
+
+# CA2008: "Do not create tasks without passing a TaskScheduler"
+dotnet_diagnostic.CA2008.severity = warning
+
+# CA2009: "Do not call ToImmutableCollection on an ImmutableCollection value"
+dotnet_diagnostic.CA2009.severity = warning
+
+# CA2011: "Do not assign property within its setter"
+dotnet_diagnostic.CA2011.severity = warning
+
+# CA2012: "Use ValueTasks correctly"
+dotnet_diagnostic.CA2012.severity = warning
+
+# CA2013: "Do not use ReferenceEquals with value types"
+dotnet_diagnostic.CA2013.severity = warning
+
+# CA2014: "Do not use stackalloc in loops"
+dotnet_diagnostic.CA2014.severity = warning
+
+# CA2015: "Do not define finalizers for types derived from MemoryManager<T>"
+dotnet_diagnostic.CA2015.severity = warning
+
+# CA2016: "Forward the CancellationToken parameter to methods that take one"
+dotnet_diagnostic.CA2016.severity = warning
+
+# CA2017: "Parameter count mismatch"
+dotnet_diagnostic.CA2017.severity = warning
+
+# CA2018: "The count argument to Buffer.BlockCopy should specify the number of bytes to copy"
+dotnet_diagnostic.CA2018.severity = warning
+
+# CA2019: "ThreadStatic fields should not use inline initialization"
+dotnet_diagnostic.CA2019.severity = warning
+
+# CA2020: "Prevent behavioral change caused by built-in operators of IntPtr/UIntPtr"
+dotnet_diagnostic.CA2020.severity = warning
+
+# CA2100: "Review SQL queries for security vulnerabilities"
+dotnet_diagnostic.CA2100.severity = warning
+
+# CA2109: "Review visible event handlers"
+dotnet_diagnostic.CA2109.severity = warning
+
+# CA2119: "Seal methods that satisfy private interfaces"
+dotnet_diagnostic.CA2119.severity = warning
+
+# CA2153: "Avoid handling Corrupted State Exceptions"
+dotnet_diagnostic.CA2153.severity = warning
+
+# CA2200: "Rethrow to preserve stack details."
+dotnet_diagnostic.CA2200.severity = warning
+
+# CA2201: "Do not raise reserved exception types"
+# TODO: Good to have; should turn into a warning.
+dotnet_diagnostic.CA2201.severity = suggestion
+
+# CA2207: "Initialize value type static fields inline"
+dotnet_diagnostic.CA2207.severity = warning
+
+# CA2208: "Instantiate argument exceptions correctly"
+dotnet_diagnostic.CA2208.severity = warning
+
+# CA2211: "Non-constant fields should not be visible"
+# PEARL: When this rule says "non-constant" it does not actually mean "non-constant"; it means "non-readonly". The rule
+#    is not about restricting the visibility of fields unless they are `const`, (and it would not make any sense to do
+#    so,) it is about restricting the visibility of fields unless they are `readonly`.
+# PEARL: When this rule says "fields" it does not actually mean "fields"; it means "static fields". I do not know
+#    whether this is intentional, and nowhere in the description of the rule does it state that, but experimentation
+#    with the rule shows that it does not check instance fields. Apparently, according to Microsoft, visible mutable
+#    static fields are worthy of warning against, whereas visible mutable instance fields are all fine and dandy.
+dotnet_diagnostic.CA2211.severity = warning
+
+# CA2213: "Disposable fields should be disposed"
+# PEARL: This rule will also flag fields that are initialized from constructor parameters, which should NOT be disposed
+#        because they are passed, not owned.  So, this rule very often needs to be suppressed.
+dotnet_diagnostic.CA2213.severity = warning
+
+# CA2214: "Do not call overridable methods in constructors"
+# PEARL: This rule does not seem to work sometimes, and I do not know why.
+dotnet_diagnostic.CA2214.severity = warning
+
+# CA2215: "Dispose methods should call base class dispose"
+dotnet_diagnostic.CA2215.severity = warning
+
+# CA2216: "Disposable types should declare finalizer"
+# TODO: I am not sure what is going on here; none of our disposable types declares a finalizer, and yet I have never
+#       seen this rule trigger. Investigate this.
+dotnet_diagnostic.CA2216.severity = warning
+
+# CA2217: "Do not mark enums with FlagsAttribute"
+# TODO: Revise this.
+dotnet_diagnostic.CA2217.severity = warning
+
+# CA2218: "Override GetHashCode on overriding Equals"
+# TODO: Revise this. Perhaps mutable collections should override GetHashCode only to `Assert( false );` in it.
+dotnet_diagnostic.CA2218.severity = warning
+
+# CA2219: "Do not raise exceptions in finally clauses"
+dotnet_diagnostic.CA2219.severity = warning
+
+# CA2224: "Override Equals on overloading operator equals"
+dotnet_diagnostic.CA2224.severity = warning
+
+# CA2225: "Operator overloads have named alternates"
+dotnet_diagnostic.CA2225.severity = none
+# Justification: #AintNoBodyGotNoTimeFoDat.
+
+# CA2226: "Operators should have symmetrical overloads"
+dotnet_diagnostic.CA2226.severity = warning
+
+# CA2227: "Collection properties should be read only"
+dotnet_diagnostic.CA2227.severity = warning
+
+# CA2229: "Implement serialization constructors"
+dotnet_diagnostic.CA2229.severity = none
+# Justification: #AintNoBodyGotNoTimeFoDat.
+
+# CA2231: "Overload operator equals on overriding value type Equals"
+dotnet_diagnostic.CA2231.severity = none
+# Justification: Not a warning because #AintNoBodyGotNoTimeFoDat.
+
+# CA2234: "Pass system uri objects instead of strings"
+dotnet_diagnostic.CA2234.severity = warning
+
+# CA2235: "Mark all non-serializable fields"
+dotnet_diagnostic.CA2235.severity = warning
+
+# CA2237: "Mark ISerializable types with SerializableAttribute"
+dotnet_diagnostic.CA2237.severity = suggestion
+# Justification: Not a warning because #AintNoBodyGotNoTimeFoDat.
+
+# CA2241: "Provide correct arguments to formatting methods"
+dotnet_diagnostic.CA2241.severity = warning
+
+# CA2242: "Test for NaN correctly"
+dotnet_diagnostic.CA2242.severity = warning
+
+# CA2243: "Attribute string literals should parse correctly"
+dotnet_diagnostic.CA2243.severity = warning
+
+# CA2244: "Do not duplicate indexed element initializations"
+dotnet_diagnostic.CA2244.severity = warning
+
+# CA2245: "Do not assign a property to itself."
+dotnet_diagnostic.CA2245.severity = warning
+
+# CA2246: "Assigning symbol and its member in the same statement."
+#         a.k.a. "Do not assign a symbol and its member in the same statement"
+dotnet_diagnostic.CA2246.severity = warning
+
+# CA2247: "Argument passed to TaskCompletionSource constructor should be TaskCreationOptions enum instead of TaskContinuationOptions enum"
+dotnet_diagnostic.CA2247.severity = warning
+
+# CA2248: "Provide correct enum argument to Enum.HasFlag"
+dotnet_diagnostic.CA2248.severity = warning
+
+# CA2249: "Consider using String.Contains instead of String.IndexOf"
+dotnet_diagnostic.CA2249.severity = warning
+
+# CA2250: "Use `ThrowIfCancellationRequested`"
+dotnet_diagnostic.CA2250.severity = warning
+
+# CA2251: "Use String.Equals over String.Compare"
+dotnet_diagnostic.CA2251.severity = warning
+
+# CA2252: "Opt in to preview features before using them"
+dotnet_diagnostic.CA2252.severity = warning
+
+# CA2253: "Named placeholders should not be numeric values"
+dotnet_diagnostic.CA2253.severity = warning
+
+# CA2254: "Template should be a static expression"
+dotnet_diagnostic.CA2254.severity = warning
+
+# CA2255: "The `ModuleInitializer` attribute should not be used in libraries"
+dotnet_diagnostic.CA2255.severity = warning
+
+# CA2256: "All members declared in parent interfaces must have an implementation in a DynamicInterfaceCastableImplementation-attributed interface"
+dotnet_diagnostic.CA2256.severity = warning
+
+# CA2257: "Members defined on an interface with the 'DynamicInterfaceCastableImplementationAttribute' should be 'static'"
+dotnet_diagnostic.CA2257.severity = warning
+
+# CA2258: "Providing a 'DynamicInterfaceCastableImplementation' interface in Visual Basic is unsupported"
+dotnet_diagnostic.CA2258.severity = warning
+
+# CA2259: "Ensure ThreadStatic is only used with static fields"
+dotnet_diagnostic.CA2259.severity = warning
+
+# CA2260: "Implement generic math interfaces correctly"
+# PEARL: Microsoft documentation also refers to this as CA2260: "Use correct type parameter".
+dotnet_diagnostic.CA2260.severity = warning
+
+# CA2261 "Do not use ConfigureAwaitOptions.SuppressThrowing with Task<TResult>"
+dotnet_diagnostic.CA2261.severity = warning
+
+# CA2264 "Do not pass a non-nullable value to ArgumentNullException.ThrowIfNull"
+dotnet_diagnostic.CA2264.severity = warning
+
+# CA2265 "Do not compare Span<T> to null or default"
+dotnet_diagnostic.CA2265.severity = warning
+
+# CA2300: "Do not use insecure deserializer BinaryFormatter"
+dotnet_diagnostic.CA2300.severity = warning
+
+# CA2301: "Do not call BinaryFormatter.Deserialize without first setting BinaryFormatter.Binder"
+dotnet_diagnostic.CA2301.severity = warning
+
+# CA2302: "Ensure BinaryFormatter.Binder is set before calling BinaryFormatter.Deserialize"
+dotnet_diagnostic.CA2302.severity = warning
+
+# CA2305: "Do not use insecure deserializer LosFormatter"
+dotnet_diagnostic.CA2305.severity = warning
+
+# CA2310: "Do not use insecure deserializer NetDataContractSerializer"
+dotnet_diagnostic.CA2310.severity = warning
+
+# CA2311: "Do not deserialize without first setting NetDataContractSerializer.Binder"
+dotnet_diagnostic.CA2311.severity = warning
+
+# CA2312: "Ensure NetDataContractSerializer.Binder is set before deserializing"
+dotnet_diagnostic.CA2312.severity = warning
+
+# CA2315: "Do not use insecure deserializer ObjectStateFormatter"
+dotnet_diagnostic.CA2315.severity = warning
+
+# CA2321: "Do not deserialize with JavaScriptSerializer using a SimpleTypeResolver"
+dotnet_diagnostic.CA2321.severity = warning
+
+# CA2322: "Ensure JavaScriptSerializer is not initialized with SimpleTypeResolver before deserializing"
+dotnet_diagnostic.CA2322.severity = warning
+
+# CA2326: "Do not use TypeNameHandling values other than None"
+dotnet_diagnostic.CA2326.severity = warning
+
+# CA2327: "Do not use insecure JsonSerializerSettings"
+dotnet_diagnostic.CA2327.severity = warning
+
+# CA2328: "Ensure that JsonSerializerSettings are secure"
+dotnet_diagnostic.CA2328.severity = warning
+
+# CA2329: "Do not deserialize with JsonSerializer using an insecure configuration"
+dotnet_diagnostic.CA2329.severity = warning
+
+# CA2330: "Ensure that JsonSerializer has a secure configuration when deserializing"
+dotnet_diagnostic.CA2330.severity = warning
+
+# CA2350: "Ensure DataTable.ReadXml()'s input is trusted"
+dotnet_diagnostic.CA2350.severity = warning
+
+# CA2351: "Ensure DataSet.ReadXml()'s input is trusted"
+dotnet_diagnostic.CA2351.severity = warning
+
+# CA2352: "Unsafe DataSet or DataTable in serializable type can be vulnerable to remote code execution attacks"
+dotnet_diagnostic.CA2352.severity = warning
+
+# CA2353: "Unsafe DataSet or DataTable in serializable type"
+dotnet_diagnostic.CA2353.severity = warning
+
+# CA2354: "Unsafe DataSet or DataTable in deserialized object graph can be vulnerable to remote code execution attack"
+dotnet_diagnostic.CA2354.severity = warning
+
+# CA2355: "Unsafe DataSet or DataTable in deserialized object graph"
+dotnet_diagnostic.CA2355.severity = warning
+
+# CA2356: "Unsafe DataSet or DataTable type in web deserialized object graph"
+dotnet_diagnostic.CA2356.severity = warning
+
+# CA2361: "Ensure autogenerated class containing DataSet.ReadXml() is not used with untrusted data"
+dotnet_diagnostic.CA2361.severity = warning
+
+# CA2362: "Unsafe DataSet or DataTable in autogenerated serializable type can be vulnerable to remote code execution attacks"
+dotnet_diagnostic.CA2362.severity = warning
+
+# CA3001: "Review code for SQL injection vulnerabilities"
+dotnet_diagnostic.CA3001.severity = warning
+
+# CA3002: "Review code for XSS vulnerabilities"
+dotnet_diagnostic.CA3002.severity = warning
+
+# CA3003: "Review code for file path injection vulnerabilities"
+dotnet_diagnostic.CA3003.severity = warning
+
+# CA3004: "Review code for information disclosure vulnerabilities"
+dotnet_diagnostic.CA3004.severity = warning
+
+# CA3005: "Review code for LDAP injection vulnerabilities"
+dotnet_diagnostic.CA3005.severity = warning
+
+# CA3006: "Review code for process command injection vulnerabilities"
+dotnet_diagnostic.CA3006.severity = warning
+
+# CA3007: "Review code for open redirect vulnerabilities"
+dotnet_diagnostic.CA3007.severity = warning
+
+# CA3008: "Review code for XPath injection vulnerabilities"
+dotnet_diagnostic.CA3008.severity = warning
+
+# CA3009: "Review code for XML injection vulnerabilities"
+dotnet_diagnostic.CA3009.severity = warning
+
+# CA3010: "Review code for XAML injection vulnerabilities"
+dotnet_diagnostic.CA3010.severity = warning
+
+# CA3011: "Review code for DLL injection vulnerabilities"
+dotnet_diagnostic.CA3011.severity = warning
+
+# CA3012: "Review code for regex injection vulnerabilities"
+dotnet_diagnostic.CA3012.severity = warning
+
+# CA3061: "Do not add schema by URL"
+dotnet_diagnostic.CA3061.severity = warning
+
+# CA3075: "Insecure DTD Processing"
+dotnet_diagnostic.CA3075.severity = warning
+
+# CA3076: "Insecure XSLT Script Execution"
+dotnet_diagnostic.CA3076.severity = warning
+
+# CA3077: "Insecure Processing in API Design, XML Document and XML Text Reader"
+dotnet_diagnostic.CA3077.severity = warning
+
+# CA3147: "Mark verb handlers with ValidateAntiForgeryToken"
+dotnet_diagnostic.CA3147.severity = warning
+
+# CA5350: "Do Not Use Weak Cryptographic Algorithms"
+dotnet_diagnostic.CA5350.severity = warning
+
+# CA5351: "Do Not Use Broken Cryptographic Algorithms"
+dotnet_diagnostic.CA5351.severity = warning
+
+# CA5358: "Do Not Use Unsafe Cipher Modes"
+dotnet_diagnostic.CA5358.severity = warning
+
+# CA5359: "Do not disable certificate validation"
+dotnet_diagnostic.CA5359.severity = warning
+
+# CA5360: "Do not call dangerous methods in deserialization"
+dotnet_diagnostic.CA5360.severity = warning
+
+# CA5361: "Do not disable SChannel use of strong crypto"
+dotnet_diagnostic.CA5361.severity = warning
+
+# CA5362: "Potential reference cycle in deserialized object graph"
+dotnet_diagnostic.CA5362.severity = warning
+
+# CA5363: "Do not disable request validation"
+dotnet_diagnostic.CA5363.severity = warning
+
+# CA5364: "Do not use deprecated security protocols"
+dotnet_diagnostic.CA5364.severity = warning
+
+# CA5365: "Do Not Disable HTTP Header Checking"
+dotnet_diagnostic.CA5365.severity = warning
+
+# CA5366: "Use XmlReader For DataSet Read XML"
+dotnet_diagnostic.CA5366.severity = warning
+
+# CA5367: "Do not serialize types with pointer fields"
+dotnet_diagnostic.CA5367.severity = warning
+
+# CA5368: "Set ViewStateUserKey For Classes Derived From Page"
+dotnet_diagnostic.CA5368.severity = warning
+
+# CA5369: "Use XmlReader for Deserialize"
+dotnet_diagnostic.CA5369.severity = warning
+
+# CA5370: "Use XmlReader for validating reader"
+dotnet_diagnostic.CA5370.severity = warning
+
+# CA5371: "Use XmlReader for schema read"
+dotnet_diagnostic.CA5371.severity = warning
+
+# CA5372: "Use XmlReader for XPathDocument"
+dotnet_diagnostic.CA5372.severity = warning
+
+# CA5373: "Do not use obsolete key derivation function"
+dotnet_diagnostic.CA5373.severity = warning
+
+# CA5374: "Do not use XslTransform"
+dotnet_diagnostic.CA5374.severity = warning
+
+# CA5375: "Do not use account shared access signature"
+dotnet_diagnostic.CA5375.severity = warning
+
+# CA5376: "Use SharedAccessProtocol HttpsOnly"
+dotnet_diagnostic.CA5376.severity = warning
+
+# CA5377: "Use container level access policy"
+dotnet_diagnostic.CA5377.severity = warning
+
+# CA5378: "Do not disable ServicePointManagerSecurityProtocols"
+dotnet_diagnostic.CA5378.severity = warning
+
+# CA5379: "Ensure key derivation function algorithm is sufficiently strong"
+dotnet_diagnostic.CA5379.severity = warning
+
+# CA5380: "Do not add certificates to root store"
+dotnet_diagnostic.CA5380.severity = warning
+
+# CA5381: "Ensure certificates are not added to root store"
+dotnet_diagnostic.CA5381.severity = warning
+
+# CA5382: "Use secure cookies in ASP.NET Core"
+dotnet_diagnostic.CA5382.severity = warning
+
+# CA5383: "Ensure use secure cookies in ASP.NET Core"
+dotnet_diagnostic.CA5383.severity = warning
+
+# CA5384: "Do not use digital signature algorithm (DSA)"
+dotnet_diagnostic.CA5384.severity = warning
+
+# CA5385: "Use Rivest–Shamir–Adleman (RSA) algorithm with sufficient key size"
+dotnet_diagnostic.CA5385.severity = warning
+
+# CA5386: "Avoid hardcoding SecurityProtocolType value"
+dotnet_diagnostic.CA5386.severity = warning
+
+# CA5387: "Do not use weak key derivation function with insufficient iteration count"
+dotnet_diagnostic.CA5387.severity = warning
+
+# CA5388: "Ensure sufficient iteration count when using weak key derivation function"
+dotnet_diagnostic.CA5388.severity = warning
+
+# CA5389: "Do not add archive item's path to the target file system path"
+dotnet_diagnostic.CA5389.severity = warning
+
+# CA5390: "Do not hard-code encryption key"
+dotnet_diagnostic.CA5390.severity = warning
+
+# CA5391: "Use antiforgery tokens in ASP.NET Core MVC controllers"
+dotnet_diagnostic.CA5391.severity = warning
+
+# CA5392: "Use DefaultDllImportSearchPaths attribute for P/Invokes"
+# TODO: Good to have; should turn into a warning.
+dotnet_diagnostic.CA5392.severity = suggestion
+
+# CA5393: "Do not use unsafe DllImportSearchPath value"
+dotnet_diagnostic.CA5393.severity = warning
+
+# CA5394: "Do not use insecure randomness"
+#         a.k.a. "Random is an insecure random number generator. Use cryptographically secure random [bla bla...]"
+# PEARL: There exists a myriad of different uses of random number generators, and only a meager few of them are related
+#        to security. Therefore, the mere use of a random number generator does not warrant issuing a warning just in
+#        case it is being used for some purpose which requires security. Furthermore, if someone is working on something
+#        which requires security, they better know what they are doing and they better not be relying on some crappy
+#        dotnet analyzer to tell them what kind of random number generator to not use.
+dotnet_diagnostic.CA5394.severity = none
+
+# CA5395: "Miss HttpVerb attribute for action methods"
+dotnet_diagnostic.CA5395.severity = warning
+
+# CA5396: "Set HttpOnly to true for HttpCookie"
+dotnet_diagnostic.CA5396.severity = warning
+
+# CA5397: "Do not use deprecated SslProtocols values"
+dotnet_diagnostic.CA5397.severity = warning
+
+# CA5398: "Avoid hardcoded SslProtocols values"
+dotnet_diagnostic.CA5398.severity = warning
+
+# CA5399: "Enable HttpClient certificate revocation list check"
+dotnet_diagnostic.CA5399.severity = warning
+
+# CA5400: "Ensure HttpClient certificate revocation list check is not disabled"
+dotnet_diagnostic.CA5400.severity = warning
+
+# CA5401: "Do not use CreateEncryptor with non-default IV"
+dotnet_diagnostic.CA5401.severity = warning
+
+# CA5402: "Use CreateEncryptor with the default IV"
+dotnet_diagnostic.CA5402.severity = warning
+
+# CA5403: "Do not hard-code certificate"
+dotnet_diagnostic.CA5403.severity = warning
+
+# CA5404: "Do not disable token validation checks"
+dotnet_diagnostic.CA5404.severity = warning
+
+# CA5405: "Do not always skip token validation in delegates"
+dotnet_diagnostic.CA5405.severity = warning
+
+########################################################################################################################
+# "SingleFile" rules (ILxxxx)
+
+# IL3000: "Avoid accessing Assembly file path when publishing as a single file"
+dotnet_diagnostic.IL3000.severity = warning
+
+# IL3001: "Avoid accessing Assembly file path when publishing as a single file"
+dotnet_diagnostic.IL3001.severity = warning
+
+# IL3002: "Avoid calling members annotated with 'RequiresAssemblyFilesAttribute' when publishing as a single file."
+dotnet_diagnostic.IL3002.severity = warning
+
+# IL3003: "'RequiresAssemblyFilesAttribute' annotations must match across all interface implementations or overrides"
+dotnet_diagnostic.IL3003.severity = warning
+
+########################################################################################################################
+# Microsoft.CodeAnalysis.BannedApiAnalyzers rules (RSxxxx)
+
+# RS0030: "Do not use banned APIs" issued by the Banned API Analyzer.
+# PEARL: When the severity of this diagnostic is `warning`, the `dotnet format` command has been observed to fail with
+#        the message "Unable to fix RS0030. No associated code fix found."
+dotnet_diagnostic.RS0030.severity = warning
+
+########################################################################################################################
+# SYSLIB diagnostics, apparently logging-generation-related
+
+# SYSLIB1001: "Logging method names can't start with an underscore"
+dotnet_diagnostic.SYSLIB1001.severity = warning
+
+# SYSLIB1002: "Don't include log level parameters as templates in the logging message"
+dotnet_diagnostic.SYSLIB1002.severity = warning
+
+# SYSLIB1003: "Logging method parameter names can't start with an underscore"
+dotnet_diagnostic.SYSLIB1003.severity = warning
+
+# SYSLIB1005: "Could not find a required type definition"
+dotnet_diagnostic.SYSLIB1005.severity = warning
+
+# SYSLIB1006: "Multiple logging methods cannot use the same event ID"
+dotnet_diagnostic.SYSLIB1006.severity = warning
+
+# SYSLIB1007: "Logging methods must return void"
+dotnet_diagnostic.SYSLIB1007.severity = warning
+
+# SYSLIB1008: "One of the arguments to a logging method must implement the ILogger interface"
+dotnet_diagnostic.SYSLIB1008.severity = warning
+
+# SYSLIB1009: "Logging methods must be static"
+dotnet_diagnostic.SYSLIB1009.severity = warning
+
+# SYSLIB1010: "Logging methods must be partial"
+dotnet_diagnostic.SYSLIB1010.severity = warning
+
+# SYSLIB1011: "Logging methods cannot be generic"
+dotnet_diagnostic.SYSLIB1011.severity = warning
+
+# SYSLIB1012: "Redundant qualifier in logging message"
+dotnet_diagnostic.SYSLIB1012.severity = warning
+
+# SYSLIB1013: "Don't include exception parameters as templates in the logging message"
+dotnet_diagnostic.SYSLIB1013.severity = warning
+
+# SYSLIB1014: "Logging template has no corresponding method argument"
+dotnet_diagnostic.SYSLIB1014.severity = warning
+
+# SYSLIB1015: "Argument is not referenced from the logging message"
+dotnet_diagnostic.SYSLIB1015.severity = warning
+
+# SYSLIB1016: "Logging methods cannot have a body"
+dotnet_diagnostic.SYSLIB1016.severity = warning
+
+# SYSLIB1017: "A LogLevel value must be supplied in the LoggerMessage attribute or as a parameter to the logging method"
+dotnet_diagnostic.SYSLIB1017.severity = warning
+
+# SYSLIB1018: "Don't include logger parameters as templates in the logging message"
+dotnet_diagnostic.SYSLIB1018.severity = warning
+
+# SYSLIB1019: "Couldn't find a field of type ILogger"
+dotnet_diagnostic.SYSLIB1019.severity = warning
+
+# SYSLIB1020: "Found multiple fields of type ILogger"
+dotnet_diagnostic.SYSLIB1020.severity = warning
+
+# SYSLIB1021: "Multiple message-template item names differ only by case"
+dotnet_diagnostic.SYSLIB1021.severity = warning
+
+# SYSLIB1022: "Can't have malformed format strings"
+dotnet_diagnostic.SYSLIB1022.severity = warning
+
+# SYSLIB1023: "Generating more than six arguments is not supported"
+dotnet_diagnostic.SYSLIB1023.severity = warning
+
+#######################################################################################################################
+# SYSLIB diagnostics, apparently json-generation-related
+
+# SYSLIB1030: "System.Text.Json source generator did not generate output for type"
+dotnet_diagnostic.SYSLIB1030.severity = warning
+
+# SYSLIB1031: "System.Text.Json source generator encountered a duplicate type info property "
+dotnet_diagnostic.SYSLIB1031.severity = warning
+
+# SYSLIB1032: "Context classes to be augmented by the System.Text.Json source generator must be declared as partial"
+dotnet_diagnostic.SYSLIB1032.severity = warning
+
+# SYSLIB1033: "System.Text.Json source generator encountered a type with multiple [JsonConstructor] annotations"
+dotnet_diagnostic.SYSLIB1033.severity = warning
+
+# SYSLIB1034: "JsonSourceGenerator encountered a [JsonStringEnumConverter] annotation"
+dotnet_diagnostic.SYSLIB1034.severity = warning
+
+# SYSLIB1035: "System.Text.Json source generator encountered a type with multiple [JsonExtensionData] annotations"
+dotnet_diagnostic.SYSLIB1035.severity = warning
+
+# SYSLIB1036: "System.Text.Json source generator encountered an invalid [JsonExtensionData] annotation"
+dotnet_diagnostic.SYSLIB1036.severity = warning
+
+# SYSLIB1037: "System.Text.Json source generator encountered a type with init-only properties which are not supported for deserialization"
+dotnet_diagnostic.SYSLIB1037.severity = warning
+
+# SYSLIB1038: "System.Text.Json source generator encountered a property annotated with [JsonInclude] but with inaccessible accessors"
+dotnet_diagnostic.SYSLIB1038.severity = warning
+
+# SYSLIB1039: "JsonSourceGenerator encountered a JsonDerivedTypeAttribute annotation with JsonSourceGenerationMode.Serialization enabled"
+dotnet_diagnostic.SYSLIB1039.severity = warning
+
+#######################################################################################################################
+# SYSLIB diagnostics for regex source generation
+
+# SYSLIB1040: "Invalid GeneratedRegexAttribute usage."
+dotnet_diagnostic.SYSLIB1040.severity = warning
+
+# SYSLIB1041: "Multiple GeneratedRegexAttribute attributes were applied to the same method, but only one is allowed."
+dotnet_diagnostic.SYSLIB1041.severity = warning
+
+# SYSLIB1042: "The specified regular expression is invalid."
+dotnet_diagnostic.SYSLIB1042.severity = warning
+
+# SYSLIB1043: "A GeneratedRegexAttribute method must be partial, parameterless, non-generic, and non-abstract, and return Regex."
+dotnet_diagnostic.SYSLIB1043.severity = warning
+
+# SYSLIB1044: "The regex generator couldn't generate a complete source implementation for the specified regular expression due to an internal limitation. See the explanation in the generated source for more details."
+dotnet_diagnostic.SYSLIB1044.severity = warning
+
+# SYSLIB1045: "Use GeneratedRegexAttribute to generate the regular expression implementation at compile time."
+dotnet_diagnostic.SYSLIB1045.severity = none
+# Justification: I doubt that compile time generation is worth the extra complication and the hassle.
+
+#######################################################################################################################
+# SYSLIB diagnostics for p/invoke source generation
+
+# SYSLIB1050: "Invalid LibraryImportAttribute usage."
+#    a.k.a. "Method '{0}' should be 'static', 'partial', and non-generic when marked with 'LibraryImportAttribute'. 
+#            P/Invoke source generation will ignore method '{0}'."
+#    a.k.a. "Method '{0}' is contained in a type '{1}' that is not marked 'partial'. P/Invoke source generation will
+#            ignore method '{0}'."
+#    a.k.a. "The configuration of 'StringMarshalling' and 'StringMarshallingCustomType' on method '{0}' is invalid."
+dotnet_diagnostic.SYSLIB1050.severity = warning
+
+# SYSLIB1051: "The specified type is not supported by source-generated p/invokes."
+#    a.k.a. "The generated source will not handle marshalling of parameter '{1}'."
+#    a.k.a. "The generated source will not handle marshalling of the return value of method '{1}'."
+dotnet_diagnostic.SYSLIB1051.severity = warning
+
+# SYSLIB1052: "The specified configuration is not supported by source-generated p/invokes."
+#    a.k.a. "The configuration is not supported by source-generated P/Invokes. If the specified configuration is
+#            required, use a regular DllImport instead."
+#    a.k.a. "The specified configuration for parameter '{1}' is not supported by source-generated P/Invokes."
+#    a.k.a. "The specified configuration for the return value of method '{1}' is not supported by source-generated
+#            P/Invokes."
+#    a.k.a. "The specified value for '{1}' is not supported by source-generated P/Invokes."
+#    a.k.a. "The specified marshalling configuration is not supported by source-generated P/Invokes."
+dotnet_diagnostic.SYSLIB1052.severity = warning
+
+# SYSLIB1053: "The specified LibraryImportAttribute arguments cannot be forwarded to DllImportAttribute."
+#            a.k.a. "'{0}' has no equivalent in 'DllImportAttribute' and will not be forwarded."
+dotnet_diagnostic.SYSLIB1053.severity = warning
+
+# SYSLIB1054: "Use LibraryImportAttribute instead of DllImportAttribute to generate p/invoke marshalling code at
+#              compile time."
+dotnet_diagnostic.SYSLIB1054.severity = none
+# Justification: I am not convinced that generation of p/invoke marshalling code at compile time is sufficiently
+#     important to warrant receiving a warning about it.
+
+# SYSLIB1055: "Invalid CustomMarshallerAttribute usage."
+dotnet_diagnostic.SYSLIB1055.severity = warning
+
+# SYSLIB1056: "The specified native type is invalid."
+dotnet_diagnostic.SYSLIB1056.severity = warning
+
+# SYSLIB1057: "The marshaller type does not have the required shape."
+dotnet_diagnostic.SYSLIB1057.severity = warning
+
+# SYSLIB1058: "Invalid NativeMarshallingAttribute usage."
+dotnet_diagnostic.SYSLIB1058.severity = warning
+
+# SYSLIB1059: "The marshaller type does not support an allocating constructor."
+dotnet_diagnostic.SYSLIB1059.severity = warning
+
+# SYSLIB1060: "The specified marshaller type is invalid."
+dotnet_diagnostic.SYSLIB1060.severity = warning
+
+# SYSLIB1061: "The marshaller type has incompatible method signatures."
+dotnet_diagnostic.SYSLIB1061.severity = warning
+
+# SYSLIB1062: "The project must be updated with <AllowUnsafeBlocks>true</AllowUnsafeBlocks>."
+dotnet_diagnostic.SYSLIB1062.severity = warning
+
+#######################################################################################################################
+# SYSLIB diagnostics for JavaScript interop source generation
+
+# SYSLIB1070: "Invalid JSImportAttribute usage."
+dotnet_diagnostic.SYSLIB1070.severity = warning
+
+# SYSLIB1071: "Invalid JSExportAttribute usage."
+dotnet_diagnostic.SYSLIB1071.severity = warning
+
+# SYSLIB1072: "The specified type is not supported by source-generated JavaScript interop."
+dotnet_diagnostic.SYSLIB1072.severity = warning
+
+# SYSLIB1073: "The specified configuration is not supported by source-generated JavaScript interop."
+dotnet_diagnostic.SYSLIB1073.severity = warning
+
+# SYSLIB1074: "JSImportAttribute requires unsafe code."
+dotnet_diagnostic.SYSLIB1074.severity = warning
+
+# SYSLIB1075: "JSExportAttribute requires unsafe code."
+dotnet_diagnostic.SYSLIB1075.severity = warning
+
+#######################################################################################################################
+# SYSLIB diagnostics for COM interop source generation
+
+# SYSLIB1090: "Invalid GeneratedComInterfaceAttribute usage."
+dotnet_diagnostic.SYSLIB1090.severity = warning
+
+# SYSLIB1091: "Method is declared in different partial declaration than the GeneratedComInterface attribute. To ensure
+#    reliable calculation for virtual method table offsets, all methods must be declared in the same partial definition
+#    of a GeneratedComInterface-attributed interface type."
+dotnet_diagnostic.SYSLIB1091.severity = warning
+
+# SYSLIB1092: "Usage of LibraryImport or GeneratedComInterface attribute does not follow recommendation."
+dotnet_diagnostic.SYSLIB1092.severity = warning
+
+# SYSLIB1093: "Analysis for COM interface generation has failed."
+dotnet_diagnostic.SYSLIB1093.severity = warning
+
+# SYSLIB1094: "The base COM interface failed to generate source. Code will not be generated for this interface."
+dotnet_diagnostic.SYSLIB1094.severity = warning
+
+# SYSLIB1095: "Invalid GeneratedComClassAttribute usage."
+dotnet_diagnostic.SYSLIB1095.severity = warning
+
+# SYSLIB1096: "Use GeneratedComInterfaceAttribute instead of ComImportAttribute to generate COM marshalling code at
+#    compile time."
+dotnet_diagnostic.SYSLIB1096.severity = none
+# Justification: I am not convinced that generation of p/invoke marshalling code at compile time is sufficiently
+#     important to warrant receiving a warning about it.
+
+# SYSLIB1097: "This type implements at least one type with the GeneratedComInterfaceAttribute attribute. Add the 
+#    GeneratedComClassAttribute to enable passing this type to COM and exposing the COM interfaces for the types with
+#    the GeneratedComInterfaceAttribute from objects of this type."
+dotnet_diagnostic.SYSLIB1097.severity = warning
+
+# SYSLIB1098: ".NET COM hosting with EnableComHosting only supports built-in COM interop. It does not support
+#    source-generated COM interop with GeneratedComInterfaceAttribute."
+dotnet_diagnostic.SYSLIB1098.severity = warning
+
+# SYSLIB1099: "COM Interop APIs on System.Runtime.InteropServices.Marshal do not support source-generated COM and will
+#    fail at run time."
+dotnet_diagnostic.SYSLIB1099.severity = warning
+
+# SYSLIB1230: "Deriving from a GeneratedComInterface-attributed interface defined in another assembly is not
+#    supported."
+dotnet_diagnostic.SYSLIB1230.severity = warning
+
+#######################################################################################################################
+# SYSLIB diagnostics for configuration binder source generation
+
+# SYSLIB1100: "Type is not supported."
+dotnet_diagnostic.SYSLIB1100.severity = warning
+
+# SYSLIB1101: "Property on type is not supported."
+dotnet_diagnostic.SYSLIB1101.severity = warning
+
+# SYSLIB1102: "Project's language version must be at least C# 12."
+dotnet_diagnostic.SYSLIB1102.severity = warning
+
+# SYSLIB1103: "Value types are invalid inputs to configuration 'Bind' methods."
+dotnet_diagnostic.SYSLIB1103.severity = warning
+
+# SYSLIB1104: "Generator cannot determine the target configuration type."
+dotnet_diagnostic.SYSLIB1104.severity = warning
+
+#######################################################################################################################
+# SYSLIB diagnostics for options validation source generation
+
+# SYSLIB1201: "Can't use ValidateObjectMembersAttribute or ValidateEnumeratedItemsAttribute on fields or properties with open generic types."
+dotnet_diagnostic.SYSLIB1201.severity = warning
+
+# SYSLIB1202: "A member type has no fields or properties to validate."
+dotnet_diagnostic.SYSLIB1202.severity = warning
+
+# SYSLIB1203: "A type has no fields or properties to validate."
+dotnet_diagnostic.SYSLIB1203.severity = warning
+
+# SYSLIB1204: "A type annotated with OptionsValidatorAttribute doesn't implement the necessary interface."
+dotnet_diagnostic.SYSLIB1204.severity = warning
+
+# SYSLIB1205: "A type already includes an implementation of the 'Validate' method."
+dotnet_diagnostic.SYSLIB1205.severity = warning
+
+# SYSLIB1206: "Can't validate private fields or properties."
+dotnet_diagnostic.SYSLIB1206.severity = warning
+
+# SYSLIB1207: "Member type is not enumerable."
+dotnet_diagnostic.SYSLIB1207.severity = warning
+
+# SYSLIB1208: "Validators used for transitive or enumerable validation must have a constructor with no parameters."
+dotnet_diagnostic.SYSLIB1208.severity = warning
+
+# SYSLIB1209: "OptionsValidatorAttribute can't be applied to a static class."
+dotnet_diagnostic.SYSLIB1209.severity = warning
+
+# SYSLIB1210: "Null validator type specified for the ValidateObjectMembersAttribute or ValidateEnumeratedItemsAttribute attributes."
+dotnet_diagnostic.SYSLIB1210.severity = warning
+
+# SYSLIB1211: "Unsupported circular references in model types."
+dotnet_diagnostic.SYSLIB1211.severity = warning
+
+# SYSLIB1212: "Member potentially missing transitive validation."
+dotnet_diagnostic.SYSLIB1212.severity = warning
+
+# SYSLIB1213: "Member potentially missing enumerable validation."
+dotnet_diagnostic.SYSLIB1213.severity = warning
+
+# SYSLIB1214: "Can't validate constants, static fields or properties."
+dotnet_diagnostic.SYSLIB1214.severity = warning
+
+# SYSLIB1215: "Validation attribute on the member is inaccessible from the validator type."
+dotnet_diagnostic.SYSLIB1215.severity = warning
+
+# SYSLIB1216: "C# language version not supported by the options validation source generator."
+dotnet_diagnostic.SYSLIB1216.severity = warning
+
+# SYSLIB1217: "The validation attribute is only applicable to properties of type string, array, or ICollection; it cannot be used with other types."
+dotnet_diagnostic.SYSLIB1217.severity = warning
+
+#######################################################################################################################
+# SYSLIB diagnostics for System.Text.Json source generation
+
+# SYSLIB1220: "JsonSourceGenerator encountered a JsonConverterAttribute with an invalid type argument."
+dotnet_diagnostic.SYSLIB1220.severity = warning
+
+# SYSLIB1221: "JsonSourceGenerator does not support this C# language version."
+dotnet_diagnostic.SYSLIB1221.severity = warning
+
+# SYSLIB1222: "Constructor annotated with JsonConstructorAttribute is inaccessible."
+dotnet_diagnostic.SYSLIB1222.severity = warning
+
+# SYSLIB1223: "Attributes deriving from JsonConverterAttribute are not supported by the source generator."
+dotnet_diagnostic.SYSLIB1223.severity = warning
+
+# SYSLIB1224: "Types annotated with JsonSerializableAttribute must be classes deriving from JsonSerializerContext."
+dotnet_diagnostic.SYSLIB1224.severity = warning
+
+# SYSLIB1225: "Reserved for System.Text.Json.SourceGeneration."
+dotnet_diagnostic.SYSLIB1225.severity = warning
+
+# SYSLIB1226: "Reserved for System.Text.Json.SourceGeneration."
+dotnet_diagnostic.SYSLIB1226.severity = warning
+
+# SYSLIB1227: "Reserved for System.Text.Json.SourceGeneration."
+dotnet_diagnostic.SYSLIB1227.severity = warning
+
+# SYSLIB1228: "Reserved for System.Text.Json.SourceGeneration."
+dotnet_diagnostic.SYSLIB1228.severity = warning
+
+# SYSLIB1229: "Reserved for System.Text.Json.SourceGeneration."
+dotnet_diagnostic.SYSLIB1229.severity = warning
+
+#######################################################################################################################
+# CSharp compiler warnings
+
+# CS0168: The variable 'var' is declared but never used
+dotnet_diagnostic.CS0168.severity = warning
+
+# CS0618: "'member' is obsolete: 'text'"
+dotnet_diagnostic.CS0618.severity = warning
+
+# CS1591: "Missing XML comment for publicly visible type or member '<>'"
+dotnet_diagnostic.CS1591.severity = none
+# Justification: #AintNoBodyGotNoTimeFoDat
+
+# CS1570: "XML comment has badly formed XML - - 'End tag '<>' does not match the start tag 'summary'.'"
+dotnet_diagnostic.CS1570.severity = warning
+
+# CS1572: "XML comment has a param tag for '<>', but there is no parameter by that name"
+dotnet_diagnostic.CS1572.severity = warning
+
+# CS1573: "Parameter '<>' has no matching param tag in the XML comment for '<>' (but other parameters do)"
+dotnet_diagnostic.CS1573.severity = warning
+
+# CS1574: "XML comment has cref attribute '<>' that could not be resolved"
+dotnet_diagnostic.CS1574.severity = warning
+
+# CS1587: "XML comment is not placed on a valid language element"
+dotnet_diagnostic.CS1587.severity = warning
+
+########################################################################################################################
+# Regular Expression rules (RExxxx)
+
+# RE0001: "Invalid regex pattern"
+dotnet_diagnostic.RE0001.severity = warning
+
+########################################################################################################################
+# JSON rules (JSONxxxx)
+
+# JSON001: "Invalid JSON pattern"
+dotnet_diagnostic.JSON001.severity = warning
+
+# JSON002: "Probable JSON string detected"
+dotnet_diagnostic.JSON002.severity = warning

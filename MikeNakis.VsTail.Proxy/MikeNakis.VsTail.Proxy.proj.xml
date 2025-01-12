@@ -1,0 +1,10 @@
+<Project>
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<IncludeMikeNakisBannedApis>False</IncludeMikeNakisBannedApis>
+	</PropertyGroup>
+	
+	<Import Project="MikeNakis.CommonFiles.proj.xml" />
+
+</Project>
