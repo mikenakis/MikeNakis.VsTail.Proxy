@@ -1336,6 +1336,9 @@ dotnet_diagnostic.CA1805.severity = suggestion
 # CA1806: "Do not ignore method results"
 dotnet_diagnostic.CA1806.severity = warning
 
+# TODO: add '|'-separated methods here, in "documentation ID format" (see https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/documentation-comments#d4-processing-the-documentation-file)
+dotnet_code_quality.CA1806.additional_use_results_methods = M:MyNamespace.MyType.MyMethod1(ParamType)
+
 # CA1807: Used to be FxCop rule "Avoid unnecessary string creation", does not exist anymore.
 # CA1808: Does not exist.
 # CA1809: Used to be FxCop rule "Avoid excessive locals", does not exist anymore.
