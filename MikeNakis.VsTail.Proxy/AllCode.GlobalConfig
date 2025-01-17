@@ -401,6 +401,9 @@ dotnet_diagnostic.IDE0058.severity = silent
 	csharp_style_unused_value_expression_statement_preference = unused_local_variable
 
 # IDE0059 "Remove unnecessary value assignment"
+# PEARL: IDE0059 is supposed to do the same thing as CA1804, so it would be superfluous, except that CA1804 does not actually work.
+# PEARL: IDE0059 also does not work in some scenarios; for example, IDE0059 does not work for unused variables in nested methods.
+# See also CA1804
 dotnet_diagnostic.IDE0059.severity = warning
 
 	csharp_style_unused_value_assignment_preference = discard_variable
@@ -1327,17 +1330,29 @@ dotnet_diagnostic.CA1801.severity = warning
 dotnet_diagnostic.CA1802.severity = suggestion
 
 # CA1804: "Remove unused locals"
-# PEARL: currently, this does not seem to be working! See https://github.com/dotnet/roslyn-analyzers/issues/7412
+# PEARL: CA1804 does not work, and it has not worked for more than a decade.
+# See Stack Overflow: "Why is no warning given for this unused variable?"  https://stackoverflow.com/q/10593547/773113
+# See Stack Overflow: "Where is the setting for highlighting unused variables and constants in Visual Studio 2022?" https://stackoverflow.com/q/72173096/773113
+# See GitHub/dotnet/roslyn-analyzers: "Port FxCop rule CA1804: RemoveUnusedLocals" https://github.com/dotnet/roslyn-analyzers/issues/461
+# See GitHub/dotnet/roslyn-analyzers: "CA1804: Remove unused locals - Doesn't Work" https://github.com/dotnet/roslyn-analyzers/issues/2109
+# See GitHub/dotnet/roslyn-analyzers: "CA1804: Remove unused locals - not working / not ported" https://github.com/dotnet/roslyn-analyzers/issues/7412
+# See also IDE0059
 dotnet_diagnostic.CA1804.severity = warning
 
 # CA1805: "Do not initialize unnecessarily" / "Member is explicitly initialized to its default value"
 dotnet_diagnostic.CA1805.severity = suggestion
 
 # CA1806: "Do not ignore method results"
+# PEARL: The category to which this rule has been assigned is "Performance". Microsoft thinks that forgetting to use the
+#    result of an invocation is a performance issue.
+# PEARL: There is no way to mark methods whose value should not be ignored with an attribute. There exists some
+#    System.Diagnostics.Contracts.PureAttribute, but this rule does not use it.
 dotnet_diagnostic.CA1806.severity = warning
 
-# TODO: add '|'-separated methods here, in "documentation ID format" (see https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/documentation-comments#d4-processing-the-documentation-file)
-dotnet_code_quality.CA1806.additional_use_results_methods = M:MyNamespace.MyType.MyMethod1(ParamType)
+    # PEARL: Any and all methods whose return value should not be ignored must be specified using this option!  All of
+	#    them in this configuration file!  All of them in a single line!
+    # TODO: add '|'-separated methods here, in "documentation ID format" (see https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/documentation-comments#d4-processing-the-documentation-file)
+    dotnet_code_quality.CA1806.additional_use_results_methods = M:MyNamespace.MyType.MyMethod1(ParamType)
 
 # CA1807: Used to be FxCop rule "Avoid unnecessary string creation", does not exist anymore.
 # CA1808: Does not exist.
@@ -1375,14 +1390,13 @@ dotnet_diagnostic.CA1815.severity = silent
 # CA1816: "Call GC.SuppressFinalize correctly"
 #         a.k.a. "Change <class>.Dispose() to call GC.SuppressFinalize(object). This will prevent [bla bla...]"
 # PEARL: When a Dispose() method is flagged by this rule, what it usually means is that the containing class should
-#    simply be marked as sealed.
-#    So, the rule could hypothetically be beneficial.
+#    simply be marked as sealed. So, the rule could hypothetically be beneficial.
 #    However, the rule issues a biased message which gives wrong instructions to the programmer as to what to do to fix
 #    the problem.
-#    Therefore, we have to disable this rule in order to prevent programmers from applying the suggested fixes.
 dotnet_diagnostic.CA1816.severity = none
-# Justification: What dotnet thinks of as "correctly" is retarded.
-#            Do _not_ invoke System.GC.SuppressFinalize() from within `.Dispose()`; instead, use a `Lifeguard`.
+# Justification:
+#    We have to disable this rule in order to prevent programmers from applying the suggested fixes, which are retarded.
+#    Do _not_ invoke System.GC.SuppressFinalize() from within `.Dispose()`; instead, use a `Lifeguard`.
 
 # CA1819: "Properties should not return arrays"
 dotnet_diagnostic.CA1819.severity = warning
@@ -1401,6 +1415,8 @@ dotnet_diagnostic.CA1821.severity = warning
 
 # CA1822: "Mark members as static"
 dotnet_diagnostic.CA1822.severity = suggestion
+# Justification: We mark this as a suggestion so that we do not receive an annoyingly alarming warning while writing
+#    code, and before we have added code that accesses `this`.
 
 # CA1823: "Avoid unused private fields"
 dotnet_diagnostic.CA1823.severity = warning
@@ -1444,7 +1460,7 @@ dotnet_diagnostic.CA1833.severity = warning
 # CA1834: "Use StringBuilder.Append(char) for single character strings"
 #         a.k.a. "Use 'StringBuilder.Append(char)' instead of 'StringBuilder.Append(string)' when [bla bla...]"
 #         a.k.a. "Consider using 'StringBuilder.Append(char)' when applicable"
-dotnet_diagnostic.CA1834.severity = silent
+dotnet_diagnostic.CA1834.severity = none
 # Justification: #AintNoBodyGotNoTimeFoDat.
 
 # CA1835: "Prefer the memory-based overloads of ReadAsync/WriteAsync methods in stream-based classes"
