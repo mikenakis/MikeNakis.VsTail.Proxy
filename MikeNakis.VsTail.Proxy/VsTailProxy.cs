@@ -5,7 +5,6 @@ using SysDebug = System.Diagnostics.Debug;
 using SysDiag = System.Diagnostics;
 using SysIo = System.IO;
 using SysPipes = System.IO.Pipes;
-using SysReflect = System.Reflection;
 using SysText = System.Text;
 
 /// <summary>

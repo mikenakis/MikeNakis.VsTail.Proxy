@@ -1,0 +1,292 @@
+# This .editorconfig file contains options that cannot be placed in .globalconfig.
+# All options and analyzer rules that can go in .globalconfig should go in .globalconfig.
+
+# PEARL: MSBuild systematically treats editorconfig files with a policy of silent failure: it will never issue any
+#        warnings or errors for any garbage that this file may contain.
+# PEARL: The Visual Studio text editor has very limited support for the editorconfig file syntax. It does some
+#        highlighting of comments vs. properties, but it does not do any syntax checking or auto-completion.
+#        The documentation (https://learn.microsoft.com/en-us/visualstudio/ide/create-portable-custom-editor-options)
+#        says that it does, but the documentation is aparently outdated.
+#        The documentation also says that the "EditorConfig Language Service" extension does even more, but this
+#        extension has not been updated since 2021 and is incompatible with VS2022.
+# PEARL: As a result of the above, if something is misconfigured in editorconfig, not only it does not work, it also
+#        doesn't give you the slightest hint that it does not work, and when you finally realize that it does not work,
+#        it still does not give you the slighest hint as to _why_ it does not work.
+# PEARL: Even though editorconfig was primarily meant to control editor formatting and highlighting, Microsoft has
+#        decided to use this file format for configuring their entire code analysis system. (And this is all currently
+#        being done under a regime of silent failure.)
+# PEARL: Microsoft code analysis makes extensive use of cryptic identifiers like IDE0001 or CA1001.
+# PEARL: Different documents from Microsoft use conflicting terminology: an identifier like IDE0001 is sometimes 
+#        referred to as 'rule id' and sometimes as 'diagnostic code'. The term 'diagnostic code' is unfortunate because
+#        it already has a completely unrelated established meaning in the industry. Thus, we will be using the term
+#        'rule id' here.
+# PEARL: There exist two largely separate but also in many ways intertwined systems of notation for controlling code
+#        analysis:
+#          - "rule ids" (e.g. `dotnet_diagnostic.IDE0008.severity`)
+#          - "options" (e.g. `csharp_style_var_for_built_in_types = false`.)
+#        "Rule ids" are far more extensive than "options", but they do not control everything, so it is necessary to
+#        use them both.
+# PEARL: Sometimes a "rule id" applies to two or more "options"; sometimes two or more "rule ids" aply to just one
+#        "option"; go figure. As a result, this editorconfig file is messy; trust me, there was no other way.
+# PEARL: The usual syntax for an "option" is '<option-name> = <option-value> : <severity>'; however, in many cases the
+#        usual syntax does not apply, and severity can only be set via the cryptic "rule id".
+#        In these cases if you make the mistake of following '<option-value>' with ': <severity>', you are attempting
+#        to use a wrong syntax, and as we have already explained, MSBuild responds to wrong syntax with silent failure.
+#        So, not only the severity you are trying to set will take effect, but also, the option-value you are trying to
+#        set will not take effect either, because MSBuild ignores the entire line without giving the slightest hint that
+#        it does so.
+#        Since it is entirely unclear in which cases this works and in which cases it does not, we almost never specify
+#        severity via "option" and almost always specify it via "rule id".
+# PEARL: If you want to see diagnostics inline in the editor, it is not enough to configure them via editorconfig; you
+#        must also fiddle with certain Visual Studio options:
+#        - set Options -> Text Editor -> C# -> Advanced -> "Run background code analysis for:" to "Current document"
+#          or higher.
+#        - check Options -> Text Editor -> C# -> Advanced -> "Display diagnostics Inline (experimental)".
+# PEARL: Inline diagnostics will only be shown for certain classes of messages (CSxxxx and IDExxxx) but not for other
+#        classes of messages (CAxxxx) which will only be shown in the output window when building.
+# PEARL: When you execute `dotnet format` on a non-trivial solution, it will very likely issue the following message:
+#          > Warnings were encountered while loading the workspace. Set the verbosity option to the 'diagnostic' level
+#          > to log warnings.
+#        If you do as the message says, then there will be a bunch of lines like the following:
+#          > Found project reference without a matching metadata reference: XYZ.csproj
+#        This is discussed here:
+#          > GitHub - dotnet/format - issue #56:
+#          > What does "Found project reference without a matching metadata reference" indicate?
+#          > https://github.com/dotnet/format/issues/56
+#        The suggested solution is to edit the solution file and change the order in which projects are listed.
+#        Note that the message does not tell you during the processing of WHICH project it found that problematic
+#        project reference, so you have no way of fixing this without trial and error in the blind.
+# PEARL: For many of the rules, if you set their severity to warning, then `dotnet format` will fail with the message
+#        "Unable to fix <rule-id>. No associated code fix found."  That is one of the reasons why we never use
+#        `dotnet format`, (the command is useless,) we only use `dotnet format whitespace --folder .`.
+
+root = true
+
+[*]
+
+# Tab preferences
+# PEARL: The "Tab size" needs to be exactly the same as "Indent size" or else weird things will happen.
+# PEARL: Whatever values you enter in there might not take effect unless Visual Studio is restarted.
+indent_style = tab
+indent_size = tab
+# tab_width = 4 <-- We intentionally do _not_ set this!
+# Justification: we use tabs and we refrain from specifying the tab width so that each developer can specify their
+#    preferred tab width in Visual Studio -> Options -> Text Editor -> All Languages -> Tabs.
+#    This way, each developer can view and edit code using whatever indentation they like without having to reformat
+#    the code.
+
+# PEARL: Microsoft supposedly allows us to choose between LF and CRLF. I tried using LF, and everything seemed to work
+#        at first, but as it turns out, whenever Visual Studio automatically modifies a source file it keeps inserting
+#        CRLF line endings in it.
+#        So, next time I open that file with Visual Studio I am greeted with a dialog telling me that the file has mixed
+#        line-endings, and asks me if I want to fix them, and the default choice in the drop-down list is CRLF, so I
+#        have to change it to LF and click OK.
+#        This is untenable, as it happens several times a day, so practically, the only viable option is in fact CRLF.
+#        "You can choose any color you like as long as it is blue".
+end_of_line = crlf
+# Justification: The option is a joke; nothing but crlf actually works.
+
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+max_line_length = off
+# Justification: A line of code should be as long as the programmer wants it to be.
+#    We specify an "editor guideline" to provide a visual hint as to where lines of code should ideally end, but we
+#    intentionally do not enforce it: the guideline is advisory, and is perfectly fine for lines of code to exceed it.
+#    Feel free to have very long lines that push uninteresting stuff off the right edge of the screen in order to fit
+#    more interesting stuff in the screen vertically.
+#    If you want to make absolutely sure that all that is visible is all that there is, that is what the "Word Wrap"
+#    feature of the editor is for.
+
+# The "guidelines" setting is implemented by a Visual Studio Extension.
+# - "EditorConfig Guidelines" by Ivan.Z
+# - "Editor Guidelines" by Paul Harrington
+guidelines = 120
+# Justification: Toto I don't think we are in the Eighties anymore.
+
+# The "Editor Guidelines" extension by Paul Harrington supports styling. That's nice.
+guidelines_style = 2px dotted 40966969
+
+###############################################################################
+
+# PEARL: As of the time of writing this, there exists no official, authoritative reference for the spell checker.
+#        All that exists is a "learn about" article and some blog posts that talk about it in hand-wavy terms:
+#         - "Visual Studio Spell Checker Preview Now Available"
+#           https://devblogs.microsoft.com/visualstudio/visual-studio-spell-checker-preview-now-available/
+#         - "Learn about the Spell Checker"
+#           https://learn.microsoft.com/en-us/visualstudio/ide/text-spell-checker
+#         - "Improving the Spell Checker"
+#           https://devblogs.microsoft.com/visualstudio/improving-the-spell-checker/
+# PEARL: For the spell-checker to work, it is not enough to configure it in the .editorconfig file;
+#        each developer must also manually select "Enable Spell Checker" in Visual Studio -> Edit -> Advanced.
+# PEARL: The spell-checking dictionary for "en-us" apparently includes the word "Covfefe".
+# PEARL: The spell checker will only examine .cs files and .md files; putting the spell-checker options in a [*]
+#        section has no effect: the spell checker will still refuse to examine anything but .cs files and .md files.
+#        This means that .xaml files, .csproj files, and even this very .editorconfig file, will NOT be spell-checked,
+#        and there is absolutely nothing we can do about it. Because, Microsoft.
+#        This is especially evil in light of the fact it is precisely these file formats that have the most to benefit
+#        from spell-checking, since spelling mistakes in these files cause silent failure.
+
+[*.cs;*.md]
+
+spelling_languages = en-us
+# Justification: "initialise" instead of "initialize" makes me angry.
+
+# Possible values seem to be: strings, identifiers, comments.
+spelling_checkable_types = strings, identifiers, comments
+# Justification: Silly option with silly choices. Of course we want to have _everything_ spell-checked.
+
+# PEARL: Microsoft chooses to think of this file it in terms of exclusion, which is entirely unwarranted.
+#        As far as we are concerned, this file has nothing to do with any form of exclusion; 
+#        it is our custom spell-checking dictionary.
+spelling_exclusion_path = ./.spell-checking.dic
+
+spelling_use_default_exclusion_dictionary = false
+# Justification: The "default exclusion dictionary" for C# (csharp.dic) contains a ton of nonsense which we definitely
+#    do not want to allow.
+
+# Possible values seem to be: error, warning, information, hint.
+# PEARL: this setting is a joke. It will only affect the coloring of spelling messages in the editor and in the "Error
+#	List" window of Visual Studio. Selecting "error" will not fail the build, and will not give us any way to see all
+#   spelling mistakes in the entire solution. (Spelling mistakes will only be shown in unopened files.)
+spelling_error_severity = information
+
+########################################################################################################################
+
+[*.cs]
+
+# IDE0055: "Formatting rule"
+#          a.k.a. "Fix formatting"
+# PEARL: These are all the meager few formatting options supported by Microsoft. This is a joke.
+dotnet_diagnostic.IDE0055.severity = warning
+
+	dotnet_sort_system_directives_first = true
+	dotnet_separate_import_directive_groups = false
+	csharp_preserve_single_line_statements = false
+	csharp_preserve_single_line_blocks = true
+	csharp_new_line_before_catch = true
+	csharp_new_line_before_else = true
+	csharp_new_line_before_finally = true
+	csharp_new_line_before_members_in_anonymous_types = true
+	csharp_new_line_before_members_in_object_initializers = true
+	csharp_new_line_before_open_brace = all
+	csharp_new_line_between_query_expression_clauses = true
+	csharp_indent_block_contents = true
+	csharp_indent_braces = false
+	csharp_indent_case_contents = true
+	csharp_indent_case_contents_when_block = false
+	csharp_indent_labels = flush_left
+	csharp_indent_switch_labels = true
+	csharp_space_after_cast = false
+	csharp_space_after_colon_in_inheritance_clause = true
+	csharp_space_after_comma = true
+	csharp_space_after_dot = false
+	csharp_space_after_keywords_in_control_flow_statements = false
+	csharp_space_after_semicolon_in_for_statement = true
+	csharp_space_around_binary_operators = before_and_after
+
+	# PEARL: The `csharp_space_around_declaration_statements` option is not about spaces, it is about _extra_ spaces
+	#        (i.e. two or more spaces.) Essentially, it can be used to allow tabular code formatting.
+	# PEARL: The valid values are `ignore` and `false`, where `ignore` means "allow", and `false` means "disallow".
+	#        (What kind of idiot thought this up?)
+	csharp_space_around_declaration_statements = false
+	# Justification: Tabular code formatting sounds like a neat idea, until you use it in an environment where multiple
+	#     programmers are working on the same code, and you realize that it often causes entirely unnecessary merge
+	#     conflicts because a change in the alignment of one line often causes a change in the alignment of multiple
+	#     preceeding and succeeding lines, even though those lines would not normally need to be modified in the context
+	#     of the issue you are working on. Unfortunately, those lines may be modified by other programmers working on
+	#     other issues, thus causing merge conflicts.
+
+	csharp_space_before_colon_in_inheritance_clause = true
+	csharp_space_before_comma = false
+	csharp_space_before_dot = false
+	csharp_space_before_open_square_brackets = false
+	csharp_space_before_semicolon_in_for_statement = false
+	csharp_space_between_empty_square_brackets = false
+	csharp_space_between_method_call_empty_parameter_list_parentheses = false
+	csharp_space_between_method_call_name_and_opening_parenthesis = false
+
+	# PEARL: The following rule is are also applied to `nameof` and `typeof` even though they are definitely not method
+	#	calls! (But it is _not_ applied to `checked()`!)
+	csharp_space_between_method_call_parameter_list_parentheses = true
+
+	csharp_space_between_method_declaration_empty_parameter_list_parentheses = false
+	csharp_space_between_method_declaration_name_and_open_parenthesis = false
+	csharp_space_between_method_declaration_parameter_list_parentheses = true
+
+	# Valid values: control_flow_statements, expressions, type_casts, false.
+	# PEARL: Any other value is treated with silent failure.
+	# PEARL: This setting controls space between parentheses in all situations _EXCEPT_ those controlled by all other
+	#	csharp_space_between_*_parentheses options.
+	# PEARL: Microsoft offers these formatting options which let you deviate from their recommended standard, but they
+	#   have never actually tried them to make sure they actually work for anything but their recommended standard.
+	#   ("You can choose any color you like as long as it is blue.")
+	#   For example, the combination of the following two:
+	#   - `csharp_space_between_parentheses = control_flow_statements`
+	#   = `csharp_space_before_semicolon_in_for_statement = false`
+	#   will cause the `for( ;; )` construct to be flagged with "IDE0055: Fix formatting", and reformatting it will mess
+	#   it up like this: `for(; ; )`. The only way to avoid this problem is to avoid the `for( ;; )` construct and use
+	#   the inferior `while( true )` construct instead.
+	csharp_space_between_parentheses = control_flow_statements
+
+	# PEARL: This controls space between all square brackets; thus, there is no way to differentiate between array
+	#	indexing expressions, array initialization statements, and indexer declarations.
+	csharp_space_between_square_brackets = false
+
+########################################################################################################################
+
+[*Tests.cs]
+
+# General syntax:
+# dotnet_naming_style.<StyleName>.capitalization = one of: pascal_case, camel_case, first_word_upper, all_upper, all_lower
+# dotnet_naming_style.<StyleName>.required_prefix = <string>
+# dotnet_naming_style.<StyleName>.required_suffix = <string>
+# dotnet_naming_style.<StyleName>.word_separator = <string>
+# dotnet_naming_symbols.<SymbolsName>.applicable_kinds = one of: *, namespace, class, struct, interface, enum, property, method, field, event, delegate, parameter, type_parameter, local, local_function
+# dotnet_naming_symbols.<SymbolsName>.applicable_accessibilities = one of: *, public, internal or friend, private, protected, protected_internal or protected_friend, private_protected, local
+# dotnet_naming_symbols.<SymbolsName>.required_modifiers = one of: abstract or must_inherit, async, const, readonly, static or shared
+# dotnet_naming_rule.<RuleName>.style = <StyleName>
+# dotnet_naming_rule.<RuleName>.symbols = <SymbolsName>
+# dotnet_naming_rule.<RuleName>.severity = one of: error, warning, suggestion, silent, none, default
+# NOTE: You must specify a capitalization style as part of your naming style, otherwise your naming style might be ignored.
+
+dotnet_naming_style.test_method_style.capitalization = pascal_case
+#dotnet_naming_style.test_method_style.required_prefix = T
+dotnet_naming_style.test_method_style.word_separator = _
+
+dotnet_naming_symbols.test_methods.applicable_kinds            = method
+dotnet_naming_symbols.test_methods.applicable_accessibilities  = public
+
+dotnet_naming_rule.test_methods_should_be_appropriately_named.severity = warning
+dotnet_naming_rule.test_methods_should_be_appropriately_named.symbols  = test_methods
+dotnet_naming_rule.test_methods_should_be_appropriately_named.style    = test_method_style
+
+########################################################################################################################
+
+[*.{xml,xaml,csproj,props,targets,config,nuspec,resx}]
+
+########################################################################################################################
+
+[*.xaml.cs]
+
+# CA1812: Avoid uninstantiated internal classes
+#         a.k.a. "'<?>' is an internal class that is apparently never instantiated. If so, [bla bla...]"
+dotnet_diagnostic.CA1812.severity = none
+# Justification: The compiler has no notion of WPF and how it works, so it is under the impression that we never 
+#    instantiate any of our views, converters, etc.
+
+########################################################################################################################
+
+[*.md]
+max_line_length = off
+trim_trailing_whitespace = false
+
+########################################################################################################################
+
+[*.g.cs]
+generated_code = true
+
+[*.yml]
+indent_style = space
+indent_size = 2
