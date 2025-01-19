@@ -21,6 +21,9 @@ is_global = true
 #######################################################################################################################
 # "Code style" rules (IDExxxx)
 
+# PEARL: The IDExxxx rules are only applicable within visual studio; they are not applied during `dotnet build`.
+#        See https://github.com/dotnet/roslyn/issues/33558
+
 # IDE0001: "Simplify name"
 dotnet_diagnostic.IDE0001.severity = warning
 
@@ -733,7 +736,7 @@ dotnet_diagnostic.IDE1005.severity = warning
 	csharp_style_conditional_delegate_call = true
 
 # IDE1006: "Naming rule violation"
-# PEARL: the severity specified here seems to take precedence over the severity specified in each individual rule!
+# PEARL: The severity specified here takes precedence over the severity specified in each individual naming rule!
 # PEARL: When the severity of IDE1006 is `warning`, the command `dotnet format style` will issue the following message:
 #          > Unable to fix IDE1006. Code fix NamingStyleCodeFixProvider doesn't support Fix All in Solution.
 dotnet_diagnostic.IDE1006.severity = warning
