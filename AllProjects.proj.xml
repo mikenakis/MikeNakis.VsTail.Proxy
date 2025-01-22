@@ -1,4 +1,12 @@
+<!-- MikeNakis.Commonfiles/AllProjects.proj.xml -->
 <Project>
+
+	<!--<Target Name="TestTarget" BeforeTargets="BeforeBuild">
+		<Message Importance="High" Text="++++++++++++++++++++ $(MSBuildProjectFile): MSBuildProjectDirectory: $(MSBuildProjectDirectory)" />
+		<Message Importance="High" Text="++++++++++++++++++++ $(MSBuildProjectFile): LocalDirectory: $(LocalDirectory)" />
+		<Message Importance="High" Text="++++++++++++++++++++ $(MSBuildProjectFile): CommonFilesAbsoluteDirectory: $(CommonFilesAbsoluteDirectory)" />
+		<Message Importance="High" Text="++++++++++++++++++++ $(MSBuildProjectFile): MikeNakisCommonFiles: $(MikeNakisCommonFiles)" />
+	</Target>-->
 
 	<PropertyGroup>
 		<LangVersion>12</LangVersion>
@@ -7,11 +15,6 @@
 		<DebugSymbols>True</DebugSymbols>
 		<DebugType Condition="'$(Configuration)' == 'Debug'">embedded</DebugType>
 		<DebugType Condition="'$(Configuration)' == 'Release'">portable</DebugType>
-
-		<!-- Magical incantations necessary for the magic to work -->
-		<!-- TODO: move this to project files that need it! -->
-		<!--<IsPackable>false</IsPackable>
-		<PreserveCompilationContext>false</PreserveCompilationContext>-->
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
@@ -23,16 +26,15 @@
 		<WarningLevel>9999</WarningLevel>
 
 		<!-- PEARL: Microsoft's understanding of the "treat warnings as errors" concept involves the promotion of every
-		            single warning into an actual error.
-					A much more reasonable approach would have been to continue treating warnings as warnings, and to
-					simply generate an error, at the end of the build, if there were any warnings. Alas, that would
-					have made too much sense.
-		            So, if TreatWarningsAsErrors is set to True, then any .editorconfig rules whose severity has been
-					explicitly set to "warning" will instead appear as errors. (What kind of idiot designed this?)
-					You can set CodeAnalysisTreatWarningsAsErrors to False, but then you forfeit the "treat warnings as
-					errors" functionality for code analysis rules, and besides, this will only affect code analysis
-					rules (CAxxxx); it will not affect formatting rule violations (IDExxxx) which will still appear
-					as errors. (What kind of full-retard designed this?) -->
+			single warning into an actual error.
+			A much more reasonable approach would have been to simply generate a single error at the end of the build, 
+			if there were any warnings during the build. Alas, that would have made too much sense.
+			So, if TreatWarningsAsErrors is set to True, then any .editorconfig rules whose severity is explicitly set
+			to "warning" will instead appear as errors. (What kind of idiot designed this?)
+			You can set CodeAnalysisTreatWarningsAsErrors to False, but then you forfeit the "treat warnings as errors"
+			functionality for code analysis rules, and besides, this will only affect code analysis	rules (CAxxxx); it
+			will not affect formatting rule violations (IDExxxx) which will still appear as errors.
+			(What kind of full-retard designed this?) -->
 		<!--<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
 		<CodeAnalysisTreatWarningsAsErrors>False</CodeAnalysisTreatWarningsAsErrors>-->
 
@@ -64,11 +66,17 @@
 	</Target>-->
 
 	<ItemGroup Condition="'$(Configuration)'=='Debug'">
-		<AdditionalFiles Include="BannedSymbols.txt" Condition="'$(IncludeMikeNakisBannedApis)' != 'False'" />
 		<!-- PEARL: if a globalconfig file is not found, we get silent failure. -->
-		<GlobalAnalyzerConfigFiles Include="AllCode.globalconfig" />
-		<GlobalAnalyzerConfigFiles Include="ProductionCode.globalconfig" Condition="'$(IsTestProject)' != 'True'" />
-		<GlobalAnalyzerConfigFiles Include="TestCode.globalconfig" Condition="'$(IsTestProject)' == 'True'" />
+		<GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)\AllCode.globalconfig" />
+		<GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)\ProductionCode.globalconfig" Condition="'$(IsTestProject)' != 'True'" />
+		<GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)\TestCode.globalconfig" Condition="'$(IsTestProject)' == 'True'" />
+		<PackageReference Include="coverlet.collector" Version="6.0.0"/>
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(IsTestProject)'=='True'">
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
+		<PackageReference Include="MSTest.TestAdapter" Version="3.6.2" />
+		<PackageReference Include="MSTest.TestFramework" Version="3.6.2" />
 	</ItemGroup>
 
 	<ItemGroup>

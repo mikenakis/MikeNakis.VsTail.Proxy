@@ -1,8 +1,6 @@
 .vs
 **/bin/**
 **/obj/**
-*.csproj.user
-*.DotSettings.user
-packages
+*.user
 *wpftmp.csproj
 .*.testana.json
