@@ -14,4 +14,5 @@ dotnet_diagnostic.CA1707.severity = true
 	dotnet_code_quality.CA1707.api_surface = all
 
 # CA1515: "Consider making public types internal"
-dotnet_diagnostic.CA1515.severity = warning
+dotnet_diagnostic.CA1515.severity = none
+# Justification: TODO

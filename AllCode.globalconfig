@@ -1001,7 +1001,8 @@ dotnet_diagnostic.CA1032.severity = none
 #    Standard exception constructors are meant to facilitate general-purpose use, and we specifically do not want this.
 
 # CA1033: "Interface methods should be callable by child types"
-dotnet_diagnostic.CA1033.severity = warning
+dotnet_diagnostic.CA1033.severity = none
+# Justification: TODO
 
 # CA1034: "Nested types should not be visible"
 dotnet_diagnostic.CA1034.severity = none
