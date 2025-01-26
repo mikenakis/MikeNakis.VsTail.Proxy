@@ -414,6 +414,8 @@ dotnet_diagnostic.IDE0059.severity = warning
 	csharp_style_unused_value_assignment_preference = discard_variable
 
 # IDE0060: "Remove unused parameter"
+# PEARL: This does not work for unused parameters of nested methods!
+# PEARL: This does not work for unused parameters of methods that contain nested methods!
 # PEARL: When the severity of IDE0060 is "warning", the command `dotnet format style` will issue a message saying:
 #          > Unable to fix IDE0060. No associated code fix found.
 dotnet_diagnostic.IDE0060.severity = warning
