@@ -895,7 +895,7 @@ dotnet_style_operator_placement_when_wrapping = beginning_of_line
 #  - internal or friend (applies to internal and private protected APIs)
 #  - private (applies to private APIs)
 #  - all (applies to all APIs)
-# The default is `public`, we want `all`.
+# The default is `public`; we want `all`, and we will set it to a stricter scope on a case-by-case basis.
 dotnet_code_quality.api_surface = all
 
 # CA1000: "Do not declare static members on generic types"
@@ -908,16 +908,11 @@ dotnet_diagnostic.CA1001.severity = warning
 
 # CA1002: Do not expose generic lists
 #         a.k.a. Change 'List<{0}>' in '{1}' to use 'Collection<T>', 'ReadOnlyCollection<T>' or 'KeyedCollection<K,V>'.
-# PEARL: Ideally we would want to have this rule, to point out improper use of `List<T>`; however, the rule points out
-#        improper use of `List<T>` and then proceeds to suggest some collections as replacements for `List<>`, but they
-#        are all unsuitable. The one replacement which is suitable is not listed, and it is `IList<T>`. Therefore, we
+# PEARL: The collections that this rule suggests as replacements for `List<>` are all retarded. The collections that
+#        would be suitable are `IList<T>` and `IReadOnlyList<T>`, but this rule is not suggesting them. Therefore, we
 #        have to disable this rule in order to prevent programmers from blindly following it and creating a mess.
 dotnet_diagnostic.CA1002.severity = none
 
-	# PEARL: If we use "dotnet_code_quality.api_surface = all", the api-surface of this rule will be affected too. Thus,
-	#        even though this rule is about not "exposing" generic lists, it will start complaining about all generic
-	#        list fields, even private ones, which are by definition not "exposed".
-	#        We fix that by setting the api-surface of this rule back to `public`.
 	dotnet_code_quality.CA1002.api_surface = public
 
 # CA1003: "Use generic event handler instances"
@@ -1069,17 +1064,10 @@ dotnet_diagnostic.CA1047.severity = warning
 dotnet_diagnostic.CA1050.severity = warning
 
 # CA1051: "Do not declare visible instance fields"
-# PEARL: This code analysis rule caters to the common misconception that visible instance fields are somehow a bad thing
-#    to have. In fact, they are perfectly fine, as long as they are readonly, but this rule prohibits all visible
-#    instance fields indiscriminately.
-#    The only scenario under which readonly visible instance fields are problematic is when building a library for third
-#    parties to use. In that and only that case it is beneficial to encapsulate instance fields via properties, so that
-#    the implementation can change without breaking binary compatibility with code that uses it.
-# PEARL: One might think that CA2211 "Non-constant fields should not be visible" can be used instead, but it cannot,
-#    because it only checks static fields, not instance fields.
+# See also: CA2211: "Non-constant fields should not be visible"
 dotnet_diagnostic.CA1051.severity = warning
-# Justification: due to the retarded way CA2211 works, we have no option but to enable CA1051, which means that we
-#    cannot have any visible instance fields even if they are readonly.
+
+	dotnet_code_quality.CA1051.api_surface = public
 
 # CA1052: "Static holder types should be Static or NotInheritable"
 # TODO: Good to have; should turn into a warning.
@@ -1678,8 +1666,8 @@ dotnet_diagnostic.CA2208.severity = warning
 #    so,) it is about restricting the visibility of fields unless they are `readonly`.
 # PEARL: When this rule says "fields" it does not actually mean "fields"; it means "static fields". I do not know
 #    whether this is intentional, and nowhere in the description of the rule does it state that, but experimentation
-#    with the rule shows that it does not check instance fields. Apparently, according to Microsoft, visible mutable
-#    static fields are worthy of warning against, whereas visible mutable instance fields are all fine and dandy.
+#    with the rule shows that it does not check instance fields.
+# See also: CA1051: "Do not declare visible instance fields"
 dotnet_diagnostic.CA2211.severity = warning
 
 # CA2213: "Disposable fields should be disposed"
