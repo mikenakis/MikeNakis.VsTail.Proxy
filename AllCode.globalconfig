@@ -476,7 +476,16 @@ dotnet_diagnostic.IDE0069.severity = error
 dotnet_diagnostic.IDE0070.severity = warning
 
 # IDE0071: "Simplify interpolation"
-dotnet_diagnostic.IDE0071.severity = warning
+# PEARL: The official documentation for this rule says that it "recommends removal of certain explicit method calls,
+#    such as ToString() ..." which begs the question: what other method calls besides ToString() does it recommend the
+#    removal of?
+# PEARL: Undocumented behavior:
+#    If the severity of this rule is set to 'silent', the invocation of `ToString()` will not be underlined as a
+#        warning, but it will be faded to indicate it is unnecessary.
+#    You have to set the severity to 'none' on order to avoid the fading.
+dotnet_diagnostic.IDE0071.severity = silent
+# Justification: I want to be able to use $"{foo.ToString()}" so that I can easily go to the definition of `ToString()`
+#    and see what it does.
 
 	dotnet_style_prefer_simplified_interpolation = true
 
