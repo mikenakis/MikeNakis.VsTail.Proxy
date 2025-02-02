@@ -989,7 +989,9 @@ dotnet_diagnostic.CA1024.severity = silent
 dotnet_diagnostic.CA1027.severity = warning
 
 # CA1028: "Enum Storage should be Int32"
-dotnet_diagnostic.CA1028.severity = warning
+dotnet_diagnostic.CA1028.severity = none
+# Justification: If I have explicitly specified the storage of an enum to something other than Int32, then I probably
+#    have my reasons for doing so, don't I?
 
 # CA1029: Undocumented/Nonexistent
 
