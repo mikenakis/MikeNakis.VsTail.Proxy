@@ -970,10 +970,9 @@ dotnet_diagnostic.CA1019.severity = warning
 # CA1020: Undocumented/Nonexistent
 
 # CA1021: "Avoid `out` parameters"
-# PEARL: The long message for this rule is "Avoid 'out' parameters as they are not designed for general audience", which
-#        is trying to imply that there was some design worth speaking of, and that different audiences were considered.
-#        That's all mythology. What they meant to say is:
-#        "Avoid 'out' parameters as it turns out that they were a bad idea afterall".
+# PEARL: The long message for this rule is "Avoid 'out' parameters as they are not designed for general audience".
+#        What they meant to say is: "Avoid 'out' parameters as it turns out that they were a bad idea afterall".
+# See also CA1045: "Do not pass types by reference"
 dotnet_diagnostic.CA1021.severity = warning
 
 # CA1022: Undocumented/Nonexistent
@@ -1044,7 +1043,7 @@ dotnet_diagnostic.CA1044.severity = warning
 # CA1045: "Do not pass types by reference"
 #         a.k.a. "Consider a design that does not require that '{0}' be a reference parameter"
 # PEARL: This rule does not refrain from checking `extern` functions, so it will flag all Win32 functions that have
-#        ref struct parameters, and are, of course, beyond my control to reconsider their design.
+#        ref struct parameters, and are, of course, beyond anyone's control to reconsider their design.
 # PEARL: The documentation for this rule says:
 #            "Passing types by reference (using `out` or `ref`) requires experience with pointers, understanding how
 #             value types and reference types differ, and handling methods that have multiple return values. Also, the
@@ -1054,7 +1053,9 @@ dotnet_diagnostic.CA1044.severity = warning
 #        milking goats.
 #        The only part that describes a real problem is the "methods that have multiple return values" part. `ref` and
 #        `out` are not functional constructs, and as such they are messy to work with.
-dotnet_diagnostic.CA1045.severity = warning
+#        Nonetheless, they are in many cases useful, so we do not want to disallow them.
+# See also CA1021: "Avoid `out` parameters"
+dotnet_diagnostic.CA1045.severity = none
 
 # CA1046: "Do not overload operator equals on reference types"
 dotnet_diagnostic.CA1046.severity = warning
