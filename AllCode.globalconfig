@@ -98,7 +98,7 @@ dotnet_diagnostic.IDE0009.severity = none
 
 # IDE0010: "Add missing cases to switch statement"
 # Also see IDE0072: "Add missing cases to switch expression"
-dotnet_diagnostic.IDE0010.severity = none
+dotnet_diagnostic.IDE0010.severity = silent
 # PEARL: Normally, we would want to have this rule; however, it triggers on pattern-matching switches where it really
 #        has nothing to suggest, and on those switches, it requires us to add an entirely redundant default clause which
 #        contains nothing but a break. So, if we were to have this rule enabled, we would be forced to also have
@@ -826,6 +826,9 @@ dotnet_diagnostic.IDE2000.severity = warning
 
 # IDE2001: "Allow embedded statements on same line"
 # PEARL: Undocumented
+# PEARL: The title of this rule is retarded. The term "embedded statement" makes no sense in C#, it refers to situations
+#    where statements of one language are allowed within the code of another language. The title should have been
+#    "Allow multiple statements on same line".
 dotnet_diagnostic.IDE2001.severity = warning
 
 	csharp_style_allow_embedded_statements_on_same_line_experimental = false
@@ -941,7 +944,6 @@ dotnet_diagnostic.CA1010.severity = warning
 # CA1011: Undocumented/Nonexistent
 
 # CA1012: "Abstract types should not have constructors"
-# TODO: Good to have; should turn into a warning.
 dotnet_diagnostic.CA1012.severity = warning
 
 # CA1013: Undocumented/Nonexistent
@@ -1012,11 +1014,11 @@ dotnet_diagnostic.CA1033.severity = none
 # Justification: TODO
 
 # CA1034: "Nested types should not be visible"
-dotnet_diagnostic.CA1034.severity = none
-# Justification: The documentation justifies this by saying "Nested types include the notion of member accessibility,
+# PEARL: The documentation justifies this by saying "Nested types include the notion of member accessibility,
 #    which some programmers do not understand clearly."
-#    Programmers who do not clearly understand the notion of member accessibility should be milking goats instead of
-#    trying to program.
+dotnet_diagnostic.CA1034.severity = none
+# Justification: Programmers who do not clearly understand the notion of member accessibility should be milking goats
+#    instead of trying to program.
 
 # CA1035: Undocumented/Nonexistent
 
