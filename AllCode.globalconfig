@@ -345,10 +345,11 @@ dotnet_diagnostic.IDE0050.severity = warning
 
 # IDE0051: "Remove unused private member"
 # Note: this is about private members that are NEITHER READ NOR WRITTEN.
-# PEARL: Presumably due to some roslyn or Visual Studio bug, if `nameof( <type> )` appears anywhere within a class,
-#    then this rule stops working for private methods in that class. (Where <type> can be any type, and "anywhere"
-#    includes even parameters to attributes on that class, and even different parts of a partial class.) 
-#    The workaround to this bug is to never use `nameof( <type> )`; use `typeof( <type> ).Name` instead.
+# PEARL: This rule does not work for unused private methods if any of the following appears within the class,
+#       including within parameters to attributes of methods of that class, and even different parts of a partial class:
+#    - `nameof( <type> )`. (Workaround: try to use `typeof( <type> ).Name` instead, when possible.)
+#    - `stackalloc`. (No workaround.)
+#    - possibly other constructs.
 #    Also see IDE0082: "Convert typeof to nameof".
 # PEARL: If the severity of IDE0051 is set to "warning", then the code cleanup action "Fix analyzer warnings and errors
 #    set in EditorConfig" will cause entire unused functions to be removed from the code! This is an extremely 
@@ -361,7 +362,7 @@ dotnet_diagnostic.IDE0051.severity = warning
 # PEARL: Under certain circumstances, IDE0052 does not work. Unread private members are not reported, and suppressions
 #        of such warnings are in turn flagged with IDE0079: "Remove unnecessary suppression".
 #        This is happening due to a compiler bug which was reported all the way back in 2021 and it has still not been
-#        fixed as of today, 2024. (See https://github.com/dotnet/roslyn/issues/54972)
+#        fixed as of 2024. (See https://github.com/dotnet/roslyn/issues/54972)
 dotnet_diagnostic.IDE0052.severity = warning
 
 # IDE0053: "Use expression body for lambdas"
