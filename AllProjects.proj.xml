@@ -15,6 +15,9 @@
 		<DebugSymbols>True</DebugSymbols>
 		<DebugType Condition="'$(Configuration)' == 'Debug'">embedded</DebugType>
 		<DebugType Condition="'$(Configuration)' == 'Release'">portable</DebugType>
+
+		<!-- The following helps with ms-buld acceleration -->
+		<ProduceReferenceAssembly>True</ProduceReferenceAssembly>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
