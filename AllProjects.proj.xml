@@ -1,13 +1,6 @@
 <!-- MikeNakis.Commonfiles/AllProjects.proj.xml -->
 <Project>
 
-	<!--<Target Name="TestTarget" BeforeTargets="BeforeBuild">
-		<Message Importance="High" Text="++++++++++++++++++++ $(MSBuildProjectFile): MSBuildProjectDirectory: $(MSBuildProjectDirectory)" />
-		<Message Importance="High" Text="++++++++++++++++++++ $(MSBuildProjectFile): LocalDirectory: $(LocalDirectory)" />
-		<Message Importance="High" Text="++++++++++++++++++++ $(MSBuildProjectFile): CommonFilesAbsoluteDirectory: $(CommonFilesAbsoluteDirectory)" />
-		<Message Importance="High" Text="++++++++++++++++++++ $(MSBuildProjectFile): MikeNakisCommonFiles: $(MikeNakisCommonFiles)" />
-	</Target>-->
-
 	<PropertyGroup>
 		<LangVersion>12</LangVersion>
 		<ImplicitUsings>Disable</ImplicitUsings>
@@ -62,11 +55,6 @@
 		<!-- Justification: It is perfectly fine for an obsolete member to override a non-obsolete member. We do so
 		     intentionally all over the place. This warning is junk. -->
 	</PropertyGroup>
-	
-	<!--<Target Name="ShowMessages" BeforeTargets="BeforeBuild">
-		<Message Importance="High" Text="++++++++++++++++++++ $(MSBuildProjectName): Production Project Setup" Condition="'$(IsTestProject)' != 'True'" />
-		<Message Importance="High" Text="++++++++++++++++++++ $(MSBuildProjectName): Test Project Setup" Condition="'$(IsTestProject)' == 'True'" />
-	</Target>-->
 
 	<ItemGroup Condition="'$(Configuration)'=='Debug'">
 		<!-- PEARL: if a globalconfig file is not found, we get silent failure. -->
