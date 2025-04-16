@@ -78,15 +78,23 @@ indent_size = tab
 #    the code.
 
 # PEARL: Microsoft supposedly allows us to choose between LF and CRLF. I tried using LF, and everything seemed to work
-#        at first, but as it turns out, whenever Visual Studio automatically modifies a source file it keeps inserting
-#        CRLF line endings in it.
-#        So, next time I open that file with Visual Studio I am greeted with a dialog telling me that the file has mixed
-#        line-endings, and asks me if I want to fix them, and the default choice in the drop-down list is CRLF, so I
-#        have to change it to LF and click OK.
-#        This is untenable, as it happens several times a day, so practically, the only viable option is in fact CRLF.
-#        "You can choose any color you like as long as it is blue".
-# end_of_line = crlf Disabled because the github runner is linux, and git normalizes line-endings.
-# Justification: The option is a joke; nothing but crlf actually works.
+#    at first, but as it turns out, whenever Visual Studio automatically modifies a source file it keeps inserting CRLF
+#    line endings in it, completely disregarding our stated preference here.
+#    So, next time I open that file with Visual Studio I am greeted with a dialog telling me that the file has mixed
+#    line-endings, and asks me if I want to fix them, which is untenable, as it happens several times a day.
+#    (Furthermore, the default choice for fixing it is CRLF, again completely disregarding our stated preference here.) 
+#    So, practically, the only viable option is in fact CRLF.
+#    "You can choose any color you like as long as it is blue".
+# PEARL: The valid values for end_of_line are "lf", "cr", or "crlf"; there is no "auto".
+#    Now, if you are developing under windows, but your build server is running linux, then you pretty much have to have
+#    git configured with `core.crlf = auto`.
+#    Thus, all your builds on the build server will be issuing warnings about inconsistent line-endings, because all
+#    your files will have lf endings on the build server, but your .editorconfig file requires crlf endings.
+#    Therefore, this option must not be used.
+# end_of_line = crlf <-- We intentionally do _not_ set this!
+# Justification: If we were to use this option, then it would have to be crlf, because nothing else works, (see comments
+#   above,) but if the build server is linux, then crlf does not work either, (see comments above,) therefore this
+#   option must be left unset.
 
 charset = utf-8
 trim_trailing_whitespace = true
