@@ -85,7 +85,7 @@ indent_size = tab
 #        have to change it to LF and click OK.
 #        This is untenable, as it happens several times a day, so practically, the only viable option is in fact CRLF.
 #        "You can choose any color you like as long as it is blue".
-end_of_line = crlf
+# end_of_line = crlf Disabled because the github runner is linux, and git normalizes line-endings.
 # Justification: The option is a joke; nothing but crlf actually works.
 
 charset = utf-8
