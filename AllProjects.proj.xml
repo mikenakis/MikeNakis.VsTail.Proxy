@@ -6,15 +6,43 @@
 		<ImplicitUsings>Disable</ImplicitUsings>
 		<Nullable>Enable</Nullable>
 		<DebugSymbols>True</DebugSymbols>
-		<DebugType Condition="'$(Configuration)' == 'Debug'">embedded</DebugType>
-		<DebugType Condition="'$(Configuration)' == 'Release'">portable</DebugType>
+		<Configurations>Debug;Release;Develop</Configurations>
 
-		<!-- The following helps with ms-buld acceleration -->
+		<DebugType Condition="'$(Configuration)' == 'Debug'"  >Embedded</DebugType>
+		<DebugType Condition="'$(Configuration)' == 'Develop'">Embedded</DebugType>
+		<DebugType Condition="'$(Configuration)' == 'Release'">Portable</DebugType>
+		
+		<EnableNETAnalyzers Condition="'$(Configuration)' == 'Debug'"  >True</EnableNETAnalyzers>
+		<EnableNETAnalyzers Condition="'$(Configuration)' == 'Develop'">False</EnableNETAnalyzers>
+		<EnableNETAnalyzers Condition="'$(Configuration)' == 'Release'">False</EnableNETAnalyzers>
+
+		<CheckForOverflowUnderflow Condition="'$(Configuration)' == 'Debug'"  >True</CheckForOverflowUnderflow>
+		<CheckForOverflowUnderflow Condition="'$(Configuration)' == 'Develop'">False</CheckForOverflowUnderflow>
+		<CheckForOverflowUnderflow Condition="'$(Configuration)' == 'Release'">False</CheckForOverflowUnderflow>
+
+		<Optimize Condition="'$(Configuration)' == 'Debug'"  >False</Optimize>
+		<Optimize Condition="'$(Configuration)' == 'Develop'">True</Optimize>
+		<Optimize Condition="'$(Configuration)' == 'Release'">True</Optimize>
+
+		<!-- The following magical incantation is necessary for the build acceleration magic to work.
+		     In Visual Studio, if you go to Options -> Projects and Solutions -> SDK Style Projects -> Up to Date Checks
+			 and make sure that:
+			 - "Don't call MSBuild if a project appears to be up to date" is checked
+			 - "Logging Level" is set to "Minimal" (or above)
+			 ...and then try to build, the following message will be emitted once for each project:
+			     "FastUpToDate: This project has enabled build acceleration, but not all referenced projects produce a
+			     reference assembly. Ensure projects producing the following outputs have the 'ProduceReferenceAssembly'
+			     MSBuild property set to 'true': [list-of-projects] See https://aka.ms/vs-build-acceleration for more
+			     information. ([name-of-project])"
+			 This magical incantation fixes this. -->
 		<ProduceReferenceAssembly>True</ProduceReferenceAssembly>
+
+		<!-- TODO: research IsTestingPlatformApplication and do something about it -->
+		<IsTestingPlatformApplication>False</IsTestingPlatformApplication>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-		<EnableNETAnalyzers>True</EnableNETAnalyzers>
+	<PropertyGroup Condition="'$(EnableNETAnalyzers)' == 'True'">
+
 		<AnalysisLevel>latest-Recommended</AnalysisLevel>
 		<RunAnalyzersDuringBuild>True</RunAnalyzersDuringBuild>
 		<RunAnalyzersDuringLiveAnalysis>True</RunAnalyzersDuringLiveAnalysis>
@@ -34,20 +62,18 @@
 		<!--<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
 		<CodeAnalysisTreatWarningsAsErrors>False</CodeAnalysisTreatWarningsAsErrors>-->
 
-		<CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-
 		<!-- PEARL: The following magical incantation is necessary or else we get the following warning:
 		            "CSC : warning EnableGenerateDocumentationFile: Set MSBuild property 'GenerateDocumentationFile'
 					to 'true' in project file to enable IDE0005 (Remove unnecessary usings/imports) on build" -->
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-
-		<!-- TODO: research IsTestingPlatformApplication and do something about it -->
-		<IsTestingPlatformApplication>False</IsTestingPlatformApplication>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)'=='Release'">
-		<EnableNETAnalyzers>False</EnableNETAnalyzers>
-	</PropertyGroup>
+	<ItemGroup Condition="'$(EnableNETAnalyzers)' == 'True'">
+		<!-- PEARL: if a globalconfig file is not found, we get silent failure. -->
+		<GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)\AllCode.globalconfig" />
+		<GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)\ProductionCode.globalconfig" Condition="'$(IsTestProject)' != 'True'" />
+		<GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)\TestCode.globalconfig" Condition="'$(IsTestProject)' == 'True'" />
+	</ItemGroup>
 
 	<PropertyGroup>
 		<!-- CS0809: "Obsolete member overrides non-obsolete member" -->
@@ -57,10 +83,6 @@
 	</PropertyGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='Debug'">
-		<!-- PEARL: if a globalconfig file is not found, we get silent failure. -->
-		<GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)\AllCode.globalconfig" />
-		<GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)\ProductionCode.globalconfig" Condition="'$(IsTestProject)' != 'True'" />
-		<GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)\TestCode.globalconfig" Condition="'$(IsTestProject)' == 'True'" />
 		<PackageReference Include="coverlet.collector" Version="6.0.0"/>
 	</ItemGroup>
 

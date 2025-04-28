@@ -112,8 +112,8 @@ dotnet_diagnostic.IDE0010.severity = silent
 #        choice that actually works is `true`.  The `false` choice does absolutely nothing, while the `when_multiline`
 #        choice does something bizarre: it requires the `then` part of an `if` statement to have braces if the `else`
 #        part is multi-line and vice versa. (Go figure.)
-# PEARL: Since "Add braces" cannot be configured to `false`, and since there is no "Remove braces" rule, we currently
-#        cannot have a warning when someone litters our code-base with redundant curly braces.
+# PEARL: Since "Add braces" configured to `false` does not work, and since there is no "Remove braces" rule, we 
+#        cannot have a warning issued when some cargo-cult programmer litters our code-base with redundant curly braces.
 #        This is typical Microsoft: they pretend to give you the option to choose, but they only give you one choice.
 #        "You can have it in any color you like, as long as it is blue."
 dotnet_diagnostic.IDE0011.severity = warning
