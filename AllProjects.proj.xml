@@ -22,6 +22,10 @@
 
 		<!-- TODO: research IsTestingPlatformApplication and do something about it -->
 		<IsTestingPlatformApplication>False</IsTestingPlatformApplication>
+
+		<PackagesConfiguration Condition="'$(Configuration)'=='Debug'">Develop</PackagesConfiguration>
+		<PackagesConfiguration Condition="'$(Configuration)'=='Develop'">Release</PackagesConfiguration>
+		<PackagesConfiguration Condition="'$(Configuration)'=='Release'">Release</PackagesConfiguration>
 	</PropertyGroup>
 
 	<Target Name="ValidateBuildConfiguration" BeforeTargets="Compile">
