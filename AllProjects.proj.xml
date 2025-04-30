@@ -6,23 +6,6 @@
 		<ImplicitUsings>Disable</ImplicitUsings>
 		<Nullable>Enable</Nullable>
 		<DebugSymbols>True</DebugSymbols>
-		<Configurations>Debug;Release;Develop</Configurations>
-
-		<DebugType Condition="'$(Configuration)' == 'Debug'"  >Embedded</DebugType>
-		<DebugType Condition="'$(Configuration)' == 'Develop'">Embedded</DebugType>
-		<DebugType Condition="'$(Configuration)' == 'Release'">Portable</DebugType>
-		
-		<EnableNETAnalyzers Condition="'$(Configuration)' == 'Debug'"  >True</EnableNETAnalyzers>
-		<EnableNETAnalyzers Condition="'$(Configuration)' == 'Develop'">False</EnableNETAnalyzers>
-		<EnableNETAnalyzers Condition="'$(Configuration)' == 'Release'">False</EnableNETAnalyzers>
-
-		<CheckForOverflowUnderflow Condition="'$(Configuration)' == 'Debug'"  >True</CheckForOverflowUnderflow>
-		<CheckForOverflowUnderflow Condition="'$(Configuration)' == 'Develop'">False</CheckForOverflowUnderflow>
-		<CheckForOverflowUnderflow Condition="'$(Configuration)' == 'Release'">False</CheckForOverflowUnderflow>
-
-		<Optimize Condition="'$(Configuration)' == 'Debug'"  >False</Optimize>
-		<Optimize Condition="'$(Configuration)' == 'Develop'">True</Optimize>
-		<Optimize Condition="'$(Configuration)' == 'Release'">True</Optimize>
 
 		<!-- The following magical incantation is necessary for the build acceleration magic to work.
 		     In Visual Studio, if you go to Options -> Projects and Solutions -> SDK Style Projects -> Up to Date Checks
@@ -41,8 +24,34 @@
 		<IsTestingPlatformApplication>False</IsTestingPlatformApplication>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(EnableNETAnalyzers)' == 'True'">
+	<Target Name="ValidateBuildConfiguration" BeforeTargets="Compile">
+		<Error Text="Invalid configuration '$(Configuration)'!" Condition="'$(Configuration)'!='Debug' AND '$(Configuration)'!='Develop' AND '$(Configuration)'!='Release'" />
+	</Target>
 
+	<PropertyGroup>
+		<!-- TODO: either the 'Develop' configuration should not define "DEBUG", or code that depends on "DEBUG" should be revised. -->
+		<DefineConstants           Condition="'$(Configuration)'=='Debug'"  >$(DefineConstants);DEBUG;TRACE</DefineConstants>
+		<DefineConstants           Condition="'$(Configuration)'=='Develop'">$(DefineConstants);DEBUG;TRACE</DefineConstants>
+		<DefineConstants           Condition="'$(Configuration)'=='Release'">$(DefineConstants);RELEASE;TRACE</DefineConstants>
+
+		<DebugType                 Condition="'$(Configuration)'=='Debug'"  >Embedded</DebugType>
+		<DebugType                 Condition="'$(Configuration)'=='Develop'">Embedded</DebugType>
+		<DebugType                 Condition="'$(Configuration)'=='Release'">Portable</DebugType>
+		
+		<CheckForOverflowUnderflow Condition="'$(Configuration)'=='Debug'"  >True</CheckForOverflowUnderflow>
+		<CheckForOverflowUnderflow Condition="'$(Configuration)'=='Develop'">False</CheckForOverflowUnderflow>
+		<CheckForOverflowUnderflow Condition="'$(Configuration)'=='Release'">False</CheckForOverflowUnderflow>
+
+		<Optimize                  Condition="'$(Configuration)'=='Debug'"  >False</Optimize>
+		<Optimize                  Condition="'$(Configuration)'=='Develop'">True</Optimize>
+		<Optimize                  Condition="'$(Configuration)'=='Release'">True</Optimize>
+		
+		<EnableNETAnalyzers        Condition="'$(Configuration)'=='Debug'"  >True</EnableNETAnalyzers>
+		<EnableNETAnalyzers        Condition="'$(Configuration)'=='Develop'">False</EnableNETAnalyzers>
+		<EnableNETAnalyzers        Condition="'$(Configuration)'=='Release'">False</EnableNETAnalyzers>
+	</PropertyGroup>
+	
+	<PropertyGroup Condition="'$(EnableNETAnalyzers)' == 'True'">
 		<AnalysisLevel>latest-Recommended</AnalysisLevel>
 		<RunAnalyzersDuringBuild>True</RunAnalyzersDuringBuild>
 		<RunAnalyzersDuringLiveAnalysis>True</RunAnalyzersDuringLiveAnalysis>
