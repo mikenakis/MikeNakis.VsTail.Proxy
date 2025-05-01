@@ -33,7 +33,7 @@
 	</Target>
 
 	<PropertyGroup>
-		<!-- TODO: either the 'Develop' configuration should not define "DEBUG", or code that depends on "DEBUG" should be revised. -->
+		<!-- TODO: differentiate Debug & Develop in terms of defined constants. -->
 		<DefineConstants           Condition="'$(Configuration)'=='Debug'"  >$(DefineConstants);DEBUG;TRACE</DefineConstants>
 		<DefineConstants           Condition="'$(Configuration)'=='Develop'">$(DefineConstants);DEBUG;TRACE</DefineConstants>
 		<DefineConstants           Condition="'$(Configuration)'=='Release'">$(DefineConstants);RELEASE;TRACE</DefineConstants>
