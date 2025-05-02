@@ -33,13 +33,18 @@
 		<!-- ManagePackageVersionsCentrally>True</ManagePackageVersionsCentrally -->
 
 		<!-- TODO: research this! -->
-		<EnableMSTestRunner>True</EnableMSTestRunner>
-		
-		<PackagesConfiguration Condition="'$(Configuration)'=='Debug'">Develop</PackagesConfiguration>
+		<!--<EnableMSTestRunner>True</EnableMSTestRunner>-->
+
+		<PackagesConfiguration Condition="'$(Configuration)'=='Debug'"  >Develop</PackagesConfiguration>
 		<PackagesConfiguration Condition="'$(Configuration)'=='Develop'">Release</PackagesConfiguration>
 		<PackagesConfiguration Condition="'$(Configuration)'=='Release'">Release</PackagesConfiguration>
-	</PropertyGroup>
 
+		<!-- CS0809: "Obsolete member overrides non-obsolete member" -->
+		<NoWarn>$(NoWarn);CS0809</NoWarn>
+		<!-- Justification: It is perfectly fine for an obsolete member to override a non-obsolete member. We do so
+		     intentionally all over the place. This warning is junk. -->
+	</PropertyGroup>
+	
 	<Target Name="ValidateBuildConfiguration" BeforeTargets="Compile">
 		<Error Text="Invalid configuration '$(Configuration)'!" Condition="'$(Configuration)'!='Debug' AND '$(Configuration)'!='Develop' AND '$(Configuration)'!='Release'" />
 	</Target>
@@ -95,13 +100,6 @@
 		<GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)\TestCode.globalconfig" Condition="'$(IsTestProject)' == 'True'" />
 	</ItemGroup>
 
-	<PropertyGroup>
-		<!-- CS0809: "Obsolete member overrides non-obsolete member" -->
-		<NoWarn>$(NoWarn);CS0809</NoWarn>
-		<!-- Justification: It is perfectly fine for an obsolete member to override a non-obsolete member. We do so
-		     intentionally all over the place. This warning is junk. -->
-	</PropertyGroup>
-
 	<ItemGroup Condition="'$(Configuration)'=='Debug'">
 		<PackageReference Include="coverlet.collector" Version="6.0.0"/>
 	</ItemGroup>
@@ -117,5 +115,14 @@
 		    https://learn.microsoft.com/en-us/visualstudio/debugger/how-to-improve-diagnostics-debugging-with-sourcelink -->
 		<!--<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All"/>-->
 	</ItemGroup>
+
+    <ItemGroup>
+        <!--<Using Include="System.Math" Static="True" />
+        <Using Include="Spectre.Console.AnsiConsole" Alias="Console" />-->
+		<Using Include="System.Collections.Generic" />
+		<Using Include="System.Linq" />
+		<!--<Using Include="System.MemoryExtensions" Static="True" />-->
+		<!--<Using Include="MikeNakis.Kit.GlobalStatics" Static="True" />-->
+    </ItemGroup>
 
 </Project>
