@@ -7,6 +7,8 @@
 		<Nullable>Enable</Nullable>
 		<DebugSymbols>True</DebugSymbols>
 		<DebugType>Portable</DebugType>
+		<Deterministic>True</Deterministic>
+		<DisableTransitiveProjectReferences>True</DisableTransitiveProjectReferences>
 
 		<!-- The following magical incantation is necessary for the build acceleration magic to work.
 		     In Visual Studio, if you go to Options -> Projects and Solutions -> SDK Style Projects -> Up to Date Checks
@@ -20,11 +22,6 @@
 			     information. ([name-of-project])"
 			 So, the following magical incantation is necessary to avoid this message. -->
 		<ProduceReferenceAssembly>True</ProduceReferenceAssembly>
-
-		<Deterministic>True</Deterministic>
-
-		<!-- TODO: research this! -->
-		<!-- DisableTransitiveProjectReferences>True</DisableTransitiveProjectReferences -->
 
 		<!-- TODO: research this! -->
 		<IsTestingPlatformApplication>False</IsTestingPlatformApplication>
@@ -117,12 +114,11 @@
 	</ItemGroup>
 
     <ItemGroup>
-        <!--<Using Include="System.Math" Static="True" />
+        <!-- Examples:
+		<Using Include="System.Math" Static="True" />
         <Using Include="Spectre.Console.AnsiConsole" Alias="Console" />-->
 		<Using Include="System.Collections.Generic" />
 		<Using Include="System.Linq" />
-		<!--<Using Include="System.MemoryExtensions" Static="True" />-->
-		<!--<Using Include="MikeNakis.Kit.GlobalStatics" Static="True" />-->
     </ItemGroup>
 
 </Project>
