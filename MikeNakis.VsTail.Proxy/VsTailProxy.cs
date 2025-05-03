@@ -1,12 +1,5 @@
 namespace MikeNakis.VsTail.Proxy;
 
-using Sys = System;
-using SysDebug = System.Diagnostics.Debug;
-using SysDiag = System.Diagnostics;
-using SysIo = System.IO;
-using SysPipes = System.IO.Pipes;
-using SysText = System.Text;
-
 /// <summary>
 /// Connects to VsTail.
 /// </summary>
@@ -72,9 +65,9 @@ public sealed class VsTailProxy
 				launchProcess( executableDirectoryPath, executableFilePath, SysDiag.ProcessWindowStyle.Minimized, arguments );
 			}
 
-			static SysPipes.NamedPipeClientStream? connectToServer( string logPathName, string solutionName, Sys.TimeSpan connectionTimeOut )
+			static SysIoPipes.NamedPipeClientStream? connectToServer( string logPathName, string solutionName, Sys.TimeSpan connectionTimeOut )
 			{
-				SysPipes.NamedPipeClientStream pipe = new( ".", serverPipeName, SysPipes.PipeDirection.InOut, SysPipes.PipeOptions.None );
+				SysIoPipes.NamedPipeClientStream pipe = new( ".", serverPipeName, SysIoPipes.PipeDirection.InOut, SysIoPipes.PipeOptions.None );
 				pipe.Connect( connectionTimeOut );
 				SysIo.StreamWriter writer = new( pipe );
 				writer.WriteLine( $"LogFile --file={logPathName} --solution={solutionName}" );
@@ -84,7 +77,7 @@ public sealed class VsTailProxy
 		}
 	}
 
-	static void log( string message ) => SysDebug.WriteLine( $"{typeof( VsTailProxy ).FullName}: {message}" );
+	static void log( string message ) => SysDiag.Debug.WriteLine( $"{typeof( VsTailProxy ).FullName}: {message}" );
 
 	static void log( string message, Sys.Exception exception ) => log( buildMediumExceptionMessage( message, exception ) );
 

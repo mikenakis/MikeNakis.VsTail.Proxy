@@ -114,11 +114,48 @@
 	</ItemGroup>
 
     <ItemGroup>
+		<!-- TODO: these are a bad idea afterall. Move them to an actual source file. -->
         <!-- Examples:
 		<Using Include="System.Math" Static="True" />
         <Using Include="Spectre.Console.AnsiConsole" Alias="Console" />-->
 		<Using Include="System.Collections.Generic" />
 		<Using Include="System.Linq" />
+		<Using Alias="ConcurrentCollections" Include="System.Collections.Concurrent" />
+		<Using Alias="LegacyCollections" Include="System.Collections" />
+		<Using Alias="LinqExpr" Include="System.Linq.Expressions" />
+		<Using Alias="SpecializedCollections" Include="System.Collections.Specialized" />
+		<Using Alias="Math" Include="System.Math" />
+		<Using Alias="RegEx" Include="System.Text.RegularExpressions" />
+		<Using Alias="Sys" Include="System" />
+		<Using Alias="SysCodeAnalysis" Include="System.Diagnostics.CodeAnalysis" />
+		<Using Alias="SysCompiler" Include="System.Runtime.CompilerServices" />
+		<Using Alias="SysCompModel" Include="System.ComponentModel" />
+		<Using Alias="SysCompress" Include="System.IO.Compression" />
+		<Using Alias="SysConfig" Include="System.Configuration" />
+		<Using Alias="SysConsole" Include="System.Console" />
+		<Using Alias="SysContracts" Include="System.Diagnostics.Contracts" />
+		<Using Alias="SysCrypto" Include="System.Security.Cryptography" />
+		<Using Alias="SysDiag" Include="System.Diagnostics" />
+		<Using Alias="SysDraw" Include="System.Drawing" />
+		<Using Alias="SysGlob" Include="System.Globalization" />
+		<!--<Using Alias="SysHttp" Include="System.Net.Http" />-->
+		<!--<Using Alias="SysImage" Include="System.Drawing.Imaging" />-->
+		<Using Alias="SysInterop" Include="System.Runtime.InteropServices" />
+		<Using Alias="SysIo" Include="System.IO" />
+		<Using Alias="SysIoPipes" Include="System.IO.Pipes" />
+		<!--<Using Alias="SysJson" Include="System.Text.Json" />-->
+		<Using Alias="SysNet" Include="System.Net" />
+		<Using Alias="SysNum" Include="System.Numerics" />
+		<Using Alias="SysObjModel" Include="System.Collections.ObjectModel" />
+		<Using Alias="SysReflect" Include="System.Reflection" />
+		<Using Alias="SysTask" Include="System.Threading.Tasks" />
+		<Using Alias="SysText" Include="System.Text" />
+		<Using Alias="SysThread" Include="System.Threading" />
+		<Using Alias="SysXml" Include="System.Xml" />
+		<Using Alias="SysXmlLinq" Include="System.Xml.Linq" />
+	
+		<Using Static="True" Include="System.Xml.XPath.Extensions" />
+		
     </ItemGroup>
 
 </Project>
