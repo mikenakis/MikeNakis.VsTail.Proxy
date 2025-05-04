@@ -46,6 +46,10 @@
 		<Error Text="Invalid configuration '$(Configuration)'!" Condition="'$(Configuration)'!='Debug' AND '$(Configuration)'!='Develop' AND '$(Configuration)'!='Release'" />
 	</Target>
 
+	<!--<Target Name="PrintStuff" BeforeTargets="Compile">
+		<Message Importance="High" Text="TargetFramework: '$(TargetFramework)' TargetPlatform: '$(TargetPlatform)' RuntimeIdentifier: '$(RuntimeIdentifier)'" />
+	</Target>-->
+
 	<PropertyGroup>
 		<DefineConstants           Condition="'$(Configuration)'=='Debug'"  >$(DefineConstants);DEBUG;PRECONDITIONS;TRACE</DefineConstants>
 		<DefineConstants           Condition="'$(Configuration)'=='Develop'">$(DefineConstants);PRECONDITIONS;TRACE</DefineConstants>
@@ -114,6 +118,7 @@
 	</ItemGroup>
 
     <ItemGroup>
+		<!-- For the `IsTargetFrameworkCompatible()` magic, see https://stackoverflow.com/a/79605485/773113 -->
 		<Using Include="System.Collections.Generic" />
 		<Using Include="System.Linq" />
 		<Using Alias="ConcurrentCollections" Include="System.Collections.Concurrent" />
@@ -128,14 +133,15 @@
 		<Using Alias="SysCompModel" Include="System.ComponentModel" />
 		<Using Alias="SysCompress" Include="System.IO.Compression" />
 		<Using Alias="SysConfig" Include="System.Configuration" />
-		<Using Alias="SysConsole" Include="System.Console" />
 		<Using Alias="SysContracts" Include="System.Diagnostics.Contracts" />
 		<Using Alias="SysCrypto" Include="System.Security.Cryptography" />
 		<Using Alias="SysDiag" Include="System.Diagnostics" />
 		<Using Alias="SysDraw" Include="System.Drawing" />
 		<Using Alias="SysGlob" Include="System.Globalization" />
 		<Using Alias="SysHttp" Include="System.Net.Http" Condition="$([MSBuild]::IsTargetFrameworkCompatible('netstandard2.0', $(TargetFramework)))" />
-		<!-- This is complicated, see https://learn.microsoft.com/en-us/dotnet/api/system.drawing.imaging -->
+		<!-- PEARL: the question of whether System.Drawing.Imaging is available or not is immensely complicated!
+		            see https://learn.microsoft.com/en-us/dotnet/api/system.drawing.imaging
+					The only solution to this problem is to have it explicitly imported by each source file that needs it. -->
 		<!-- <Using Alias="SysImage" Include="System.Drawing.Imaging" />-->
 		<Using Alias="SysInterop" Include="System.Runtime.InteropServices" />
 		<Using Alias="SysIo" Include="System.IO" />
@@ -151,7 +157,32 @@
 		<Using Alias="SysXml" Include="System.Xml" />
 		<Using Alias="SysXmlLinq" Include="System.Xml.Linq" />
 		<Using Static="True" Include="System.Xml.XPath.Extensions" />
-		<Using Static="True" Include="System.MemoryExtensions" Condition="$([MSBuild]::IsTargetFrameworkCompatible('net8.0', $(TargetFramework)))" />
+		<Using Static="True" Include="System.MemoryExtensions" Condition="$([MSBuild]::IsTargetFrameworkCompatible($(TargetFramework), 'net8.0'))" />
+		<Using Static="True" Include="System.Threading.Tasks.TaskAsyncEnumerableExtensions" Condition="$([MSBuild]::IsTargetFrameworkCompatible($(TargetFramework), 'net8.0'))" />
+
+		<!-- "Xps" stuff probably belongs to WPF, but it is not entirely clear, so let's prefix it with 'Sys' instead of 'Wpf'. -->
+		<Using Alias="SysXps" Include="System.Windows.Xps" Condition="$(UseWPF)=='True'" />
+		<Using Alias="SysXpsPackaging" Include="System.Windows.Xps.Packaging" Condition="$(UseWPF)=='True'" />
+
+		<!-- WPF stuff. -->
+		<Using Alias="Wpf" Include="System.Windows" Condition="$(UseWPF)=='True'" />
+		<Using Alias="WpfAnimation" Include="System.Windows.Media.Animation" Condition="$(UseWPF)=='True'" />
+		<Using Alias="WpfControls" Include="System.Windows.Controls" Condition="$(UseWPF)=='True'" />
+		<Using Alias="WpfData" Include="System.Windows.Data" Condition="$(UseWPF)=='True'" />
+		<Using Alias="WpfDocuments" Include="System.Windows.Documents" Condition="$(UseWPF)=='True'" />
+		<Using Alias="WpfInput" Include="System.Windows.Input" Condition="$(UseWPF)=='True'" />
+		<Using Alias="WpfInterop" Include="System.Windows.Interop" Condition="$(UseWPF)=='True'" />
+		<Using Alias="WpfMarkup" Include="System.Windows.Markup" Condition="$(UseWPF)=='True'" />
+		<Using Alias="WpfMedia" Include="System.Windows.Media" Condition="$(UseWPF)=='True'" />
+		<Using Alias="WpfNavigation" Include="System.Windows.Navigation" Condition="$(UseWPF)=='True'" />
+		<Using Alias="WpfPrimitives" Include="System.Windows.Controls.Primitives" Condition="$(UseWPF)=='True'" />
+		<Using Alias="WpfResources" Include="System.Windows.Resources" Condition="$(UseWPF)=='True'" />
+		<Using Alias="WpfShapes" Include="System.Windows.Shapes" Condition="$(UseWPF)=='True'" />
+		<Using Alias="WpfThreading" Include="System.Windows.Threading" Condition="$(UseWPF)=='True'" />
+
+		<!-- WinForms stuff. -->
+		<Using Alias="WinForms" Include="System.Windows.Forms" Condition="$(UseWindowsForms)=='True'" />
+		
     </ItemGroup>
 
 </Project>
