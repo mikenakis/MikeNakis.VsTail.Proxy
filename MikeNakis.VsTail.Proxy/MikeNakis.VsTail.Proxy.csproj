@@ -1,24 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-	<!-- PEARL: when editing .csproj files, Visual studio offers an abysmally poor developer experience:
-		- It keeps modifying .csproj files, sometimes messing them up.
-		- It keeps warning us that the project file has been changed and we better reload the project "or else."
-		- It keeps closing the project file when we reload the project.
-		- It makes it difficult to open the project file if it has been unable to load it.
-		- It scrolls to the top and loses undo information each time we save a project file.
-		To somewhat mitigate all this madness, we put nothing in .csproj files but a single statement which imports
-		another	project file with an extension that is not .csproj, so that:
-		- Visual Studio will leave the other project file alone.
-		- When Visual Studio modifies this file, it is easy to take notice. -->
-	<!-- PEARL: MSBuild compiles WPF projects twice, and this causes problems!
-	    On most projects, the following statement works:
-			<Import Project="$(MSBuildProjectName).proj.xml" />
-		However, on WPF projects, we get the following error:
-			[...] <project-name>_<random-letters>_wpftmp.csproj(L,C): error MSB4019: The imported project
-		    "[...] <project-name>_<random-letters>_wpftmp.proj.xml" was not found. Confirm that the expression in the
-			Import declaration "<project-name>_<random-letters>_wpftmp.proj.xml" is correct, and that the file exists
-			on disk.
-		The solution is to use $(AssemblyName) instead of $(MSBuildProjectName). -->
-	<Import Project="$(AssemblyName).proj.xml" />
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Configurations>Debug;Optimized;Release;Develop</Configurations>
+	</PropertyGroup>
+	
+	<Import Project="..\AllProjects.proj.xml" />
 
 </Project>

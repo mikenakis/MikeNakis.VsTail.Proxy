@@ -32,42 +32,77 @@
 		<!-- TODO: research this! -->
 		<!--<EnableMSTestRunner>True</EnableMSTestRunner>-->
 
-		<PackagesConfiguration Condition="'$(Configuration)'=='Debug'"  >Develop</PackagesConfiguration>
-		<PackagesConfiguration Condition="'$(Configuration)'=='Develop'">Release</PackagesConfiguration>
-		<PackagesConfiguration Condition="'$(Configuration)'=='Release'">Release</PackagesConfiguration>
-
 		<!-- CS0809: "Obsolete member overrides non-obsolete member" -->
 		<NoWarn>$(NoWarn);CS0809</NoWarn>
 		<!-- Justification: It is perfectly fine for an obsolete member to override a non-obsolete member. We do so
 		     intentionally all over the place. This warning is junk. -->
+
+		<!-- PEARL: these two seem to have absolutely no effect, whether you set them to True or False -->
+		<DefineDebug>False</DefineDebug>
+		<DefineTrace>False</DefineTrace>
+
+		<MSBuildCheck>True</MSBuildCheck>
 	</PropertyGroup>
-	
-	<Target Name="ValidateBuildConfiguration" BeforeTargets="Compile">
-		<Error Text="Invalid configuration '$(Configuration)'!" Condition="'$(Configuration)'!='Debug' AND '$(Configuration)'!='Develop' AND '$(Configuration)'!='Release'" />
+
+	<Choose>
+		<When Condition="'$(Configuration)'=='Debug'">
+			<PropertyGroup>
+				<!-- PEARL: DEBUG and TRACE have already been defined and they would be defined even if we did not want them to -->
+				<DefineConstants>$(DefineConstants);PRECONDITIONS;ASSERTIONS</DefineConstants>
+				<CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+				<Optimize>False</Optimize>
+				<EnableNETAnalyzers>True</EnableNETAnalyzers>
+				<PackagesConfiguration>Develop</PackagesConfiguration>
+			</PropertyGroup>
+		</When>
+		<When Condition="'$(Configuration)'=='Optimized'">
+			<PropertyGroup>
+				<DefineConstants>$(DefineConstants);PRECONDITIONS</DefineConstants>
+				<CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+				<Optimize>True</Optimize>
+				<EnableNETAnalyzers>True</EnableNETAnalyzers>
+				<PackagesConfiguration>Develop</PackagesConfiguration>
+			</PropertyGroup>
+		</When>
+		<When Condition="'$(Configuration)'=='Develop'">
+			<PropertyGroup>
+				<DefineConstants>$(DefineConstants);PRECONDITIONS</DefineConstants>
+				<CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+				<Optimize>True</Optimize>
+				<EnableNETAnalyzers>False</EnableNETAnalyzers>
+				<PackagesConfiguration>Release</PackagesConfiguration>
+				<DefineDebug>False</DefineDebug>
+				<DefineTrace>True</DefineTrace>
+			</PropertyGroup>
+		</When>
+		<When Condition="'$(Configuration)'=='Release'">
+			<PropertyGroup>
+				<DefineConstants>$(DefineConstants)</DefineConstants>
+				<CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+				<Optimize>True</Optimize>
+				<EnableNETAnalyzers>False</EnableNETAnalyzers>
+				<PackagesConfiguration>Release</PackagesConfiguration>
+			</PropertyGroup>
+		</When>
+		<Otherwise>
+			<PropertyGroup>
+				<ConfigurationIsInvalid>True</ConfigurationIsInvalid>
+			</PropertyGroup>
+		</Otherwise>
+	</Choose>
+
+	<Target Name="ValidateBuildConfiguration" BeforeTargets="Compile" Condition="'$(ConfigurationIsInvalid)'!=''">
+		<Error Text="Invalid configuration: '$(Configuration)'" />
 	</Target>
 
-	<!--<Target Name="PrintStuff" BeforeTargets="Compile">
-		<Message Importance="High" Text="TargetFramework: '$(TargetFramework)' TargetPlatform: '$(TargetPlatform)' RuntimeIdentifier: '$(RuntimeIdentifier)'" />
+	<!--<Target Name="PrintStuff1" BeforeTargets="Compile">
+		<Message Importance="High" Text="TargetFramework: '$(TargetFramework)'; TargetPlatform: '$(TargetPlatform)'; RuntimeIdentifier: '$(RuntimeIdentifier)'" />
 	</Target>-->
 
-	<PropertyGroup>
-		<DefineConstants           Condition="'$(Configuration)'=='Debug'"  >$(DefineConstants);DEBUG;PRECONDITIONS;TRACE</DefineConstants>
-		<DefineConstants           Condition="'$(Configuration)'=='Develop'">$(DefineConstants);PRECONDITIONS;TRACE</DefineConstants>
-		<DefineConstants           Condition="'$(Configuration)'=='Release'">$(DefineConstants);RELEASE;TRACE</DefineConstants>
+	<Target Name="PrintStuff2" BeforeTargets="Compile">
+		<Message Importance="High" Text="Configuration: '$(Configuration)'; DefineConstants: '$(DefineConstants)'" />
+	</Target>
 
-		<CheckForOverflowUnderflow Condition="'$(Configuration)'=='Debug'"  >True</CheckForOverflowUnderflow>
-		<CheckForOverflowUnderflow Condition="'$(Configuration)'=='Develop'">False</CheckForOverflowUnderflow>
-		<CheckForOverflowUnderflow Condition="'$(Configuration)'=='Release'">False</CheckForOverflowUnderflow>
-
-		<Optimize                  Condition="'$(Configuration)'=='Debug'"  >False</Optimize>
-		<Optimize                  Condition="'$(Configuration)'=='Develop'">True</Optimize>
-		<Optimize                  Condition="'$(Configuration)'=='Release'">True</Optimize>
-		
-		<EnableNETAnalyzers        Condition="'$(Configuration)'=='Debug'"  >True</EnableNETAnalyzers>
-		<EnableNETAnalyzers        Condition="'$(Configuration)'=='Develop'">False</EnableNETAnalyzers>
-		<EnableNETAnalyzers        Condition="'$(Configuration)'=='Release'">False</EnableNETAnalyzers>
-	</PropertyGroup>
-	
 	<PropertyGroup Condition="'$(EnableNETAnalyzers)' == 'True'">
 		<AnalysisLevel>latest-Recommended</AnalysisLevel>
 		<RunAnalyzersDuringBuild>True</RunAnalyzersDuringBuild>
@@ -117,7 +152,7 @@
 		<!--<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All"/>-->
 	</ItemGroup>
 
-    <ItemGroup>
+	<ItemGroup>
 		<!-- For the `IsTargetFrameworkCompatible()` magic, see https://stackoverflow.com/a/79605485/773113 -->
 		<Using Include="System.Collections.Generic" />
 		<Using Include="System.Linq" />
@@ -182,7 +217,7 @@
 
 		<!-- WinForms stuff. -->
 		<Using Alias="WinForms" Include="System.Windows.Forms" Condition="$(UseWindowsForms)=='True'" />
-		
-    </ItemGroup>
+
+	</ItemGroup>
 
 </Project>

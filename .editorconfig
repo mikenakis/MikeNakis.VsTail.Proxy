@@ -302,3 +302,33 @@ generated_code = true
 [*.yml]
 indent_style = space
 indent_size = 2
+
+[*.csproj]
+
+########################################################################################################################
+# BuildCheck rules (BCxxxx)
+# These rules are experimental, and not enabled by default.
+# There is (yet) no documented way of enabling BuildCheck rules when compiling from within Visual Studio.
+# The only wat to enable these rules is via the "/check" option to "dotnet build" or "msbuild".
+
+# BC0101: "Two projects should not share their OutputPath or IntermediateOutputPath locations."
+build_check.BC0101.severity=warning
+
+# BC0102: "Two tasks should not write the same file."
+build_check.BC0102.severity=warning
+
+# BC0103: "Environment variables should not be used as a value source for the properties."
+build_check.BC0103.severity=warning
+
+# BC0107: "Project <> specifies 'TargetFrameworks' property '<>' and 'TargetFramework' property '<>' at the same time."
+# PEARL: This is undocumented. 
+build_check.BC0107.severity=warning
+
+# BC0201: "A property that is accessed should be declared first."
+build_check.BC0201.severity=warning
+
+# BC0202: "A property should be declared before it is first used."
+build_check.BC0202.severity=warning
+
+# BC0203: "A property that is not used should not be declared."
+build_check.BC0203.severity=warning
