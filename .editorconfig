@@ -327,14 +327,10 @@ build_check.BC0103.severity=warning
 build_check.BC0107.severity=warning
 
 # BC0201: "A property that is accessed should be declared first."
-# PEARL: This warning flags every single property that is obtained from the environment.
-# TODO: Enable the warning and check whether it goes away when the property is specified with the /property command-line option.
-build_check.BC0201.severity=none
+build_check.BC0201.severity=warning
 
 # BC0202: "A property should be declared before it is first used."
-# PEARL: This warning flags a large number of properties, I suspect for no good reason whatsoever.
-build_check.BC0202.severity=none
+build_check.BC0202.severity=warning
 
-# BC0203: "A property that is not used should not be declared."
-# PEARL: This warning flags a large number of properties, I suspect for no good reason whatsoever.
-build_check.BC0203.severity=none
+# BC0203: "A property that is not used should not be declared" aka "Property: '<a>' was declared/initialized, but it was never used."
+build_check.BC0203.severity=warning
