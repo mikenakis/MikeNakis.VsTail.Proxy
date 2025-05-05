@@ -311,11 +311,13 @@ indent_size = 2
 # There is (yet) no documented way of enabling BuildCheck rules when compiling from within Visual Studio.
 # The only wat to enable these rules is via the "/check" option to "dotnet build" or "msbuild".
 
-# BC0101: "Two projects should not share their OutputPath or IntermediateOutputPath locations."
-build_check.BC0101.severity=warning
+# BC0101: "Two projects should not share their OutputPath or IntermediateOutputPath locations" aka "Projects <a> and <b> have conflicting output paths: <c>"
+# PEARL: This warning flags every single WPF project because the build system compiles both ProjectName.csproj and some ProjectName_random-letters_wpftmp.csproj.
+build_check.BC0101.severity=none
 
-# BC0102: "Two tasks should not write the same file."
-build_check.BC0102.severity=warning
+# BC0102: "Two tasks should not write the same file." aka "Tasks <a> and <b> from projects <c> and <d> write the same file: <e>
+# PEARL: This warning flags every single WPF project because the build system compiles both ProjectName.csproj and some ProjectName_random-letters_wpftmp.csproj.
+build_check.BC0102.severity=none
 
 # BC0103: "Environment variables should not be used as a value source for the properties."
 build_check.BC0103.severity=warning
@@ -325,10 +327,14 @@ build_check.BC0103.severity=warning
 build_check.BC0107.severity=warning
 
 # BC0201: "A property that is accessed should be declared first."
-build_check.BC0201.severity=warning
+# PEARL: This warning flags every single property that is obtained from the environment.
+# TODO: Enable the warning and check whether it goes away when the property is specified with the /property command-line option.
+build_check.BC0201.severity=none
 
 # BC0202: "A property should be declared before it is first used."
-build_check.BC0202.severity=warning
+# PEARL: This warning flags a large number of properties, I suspect for no good reason whatsoever.
+build_check.BC0202.severity=none
 
 # BC0203: "A property that is not used should not be declared."
-build_check.BC0203.severity=warning
+# PEARL: This warning flags a large number of properties, I suspect for no good reason whatsoever.
+build_check.BC0203.severity=none
