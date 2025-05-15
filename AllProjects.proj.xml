@@ -136,8 +136,9 @@
 		<GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)\TestCode.globalconfig" Condition="'$(IsTestProject)' == 'True'" />
 	</ItemGroup>
 
-	<ItemGroup Condition="'$(Configuration)'=='Debug'">
-		<PackageReference Include="coverlet.collector" Version="6.0.0"/>
+	<!-- https://github.com/coverlet-coverage/coverlet -->
+	<ItemGroup Condition="'$(Configuration)'=='Debug' AND '$(IsTestProject)' == 'True'">
+		<PackageReference Include="coverlet.collector" Version="6.0.4"/>
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(IsTestProject)'=='True'">
