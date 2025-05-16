@@ -42,6 +42,9 @@
 		<DefineTrace>False</DefineTrace>
 
 		<MSBuildCheck>True</MSBuildCheck>
+		
+		<PathMap Condition="'$(NoPathMap)' != 'True'">$(MSBuildProjectDirectory)=.\..\$(MSBuildProjectName)</PathMap>
+
 	</PropertyGroup>
 
 	<Choose>
@@ -99,9 +102,9 @@
 		<Message Importance="High" Text="TargetFramework: '$(TargetFramework)'; TargetPlatform: '$(TargetPlatform)'; RuntimeIdentifier: '$(RuntimeIdentifier)'" />
 	</Target>-->
 
-	<Target Name="PrintStuff2" BeforeTargets="Compile">
+	<!-- Target Name="PrintStuff2" BeforeTargets="Compile">
 		<Message Importance="High" Text="Configuration: '$(Configuration)'; DefineConstants: '$(DefineConstants)'" />
-	</Target>
+	</Target -->
 
 	<PropertyGroup Condition="'$(EnableNETAnalyzers)' == 'True'">
 		<AnalysisLevel>latest-Recommended</AnalysisLevel>
