@@ -57,10 +57,12 @@ dotnet_diagnostic.IDE0007.severity = silent
 # Also see IDE0007: "Use 'var' instead of explicit type".
 # Also see IDE0090: "Simplify `new` expression" (a.k.a. "target-typed `new`")
 dotnet_diagnostic.IDE0008.severity = warning
-# Justification: Here is a rule worth living by: "Any choice that makes code easier to read is preferable over any
-#    choice that makes code easier to write".
+# Justification: Here is a rule worth living by:
+#    "Any choice that makes code easier to read is preferable over any choice that makes code easier to write".
 #    The use of `var` makes code easier to write, but not easier to read, because it often leaves the reader wondering
 #    what is the exact type hidden by `var`.
+#    Script kiddies might object that on the contrary, explicitly stating the type of everything everywhere makes code
+#        harder to read, because types are just unnecessary noise to them, but script kiddies can go get a life.
 #    Therefore, never use `var` unless the type is obvious.
 #    The type is obvious only when assigning:
 #      - a literal of a built-in type. (e.g. `var a = "covfefe";`, `var a = 42;`, `var a = 5.0;`)
@@ -566,7 +568,12 @@ dotnet_diagnostic.IDE0084.severity = warning
 #          a.k.a. "implicit object creation"
 #          a.k.a. "target-typed `new`"
 # Also see IDE0008: "Use explicit type instead of 'var'"
-dotnet_diagnostic.IDE0090.severity = warning
+dotnet_diagnostic.IDE0090.severity = silent
+# Justification:
+#   Target-typed new is kinda cool at first glance, but as it turns out, it is rather cumbersome to use, because while
+#   editing code we quite often move object construction from places where target-type-new is applicable to places where
+#   it is not applicable, and vice versa, and I do not want to have to go each time and add or remove the explicit
+#   constructor invocation. Thus, this rule better be avoided.
 
 	csharp_style_implicit_object_creation_when_type_is_apparent = true
 
@@ -579,11 +586,10 @@ dotnet_diagnostic.IDE0110.severity = warning
 # IDE0120: "Simplify LINQ expression"
 dotnet_diagnostic.IDE0120.severity = silent
 # Justification: 
-#    - I like functions that do only one thing. 
-#    - I assign no significance at all to the performance overhead of the additional method call per iteration. 
-#    - I like writing `Where(...).FirstOrDefault()`, `Where(...).Count()`, etc. 
-#    - I find that the termination method overloads that duplicate the functionality of `Where()` have no real reason
-#      to exist.
+#    - I assign no significance whatsoever to the performance overhead of one additional method in the chain.
+#    - I like functions that do only one thing, and by extension function _calls_ that do only one thing.
+#    - I want the presence or absence of `Where()` to signify, at a glance, the presence or absence of a filter. 
+#    - I want the termination method call to be clutter-free, so I can easily see what the entire chain culminates in.
 
 # IDE0130: "Namespace does not match folder structure"
 # PEARL: If the severity of IDE0130 is 'warning', then `dotnet format style` will crash.
