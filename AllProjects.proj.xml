@@ -130,11 +130,11 @@
 
 	<Target Name="EmbedStartupProjectPath" BeforeTargets="BeforeBuild" Condition="('$(OutputType)' == 'Exe' OR '$(OutputType)' == 'WinExe') AND '$(IsTestProject)' == ''">
 		<PropertyGroup>
-			<Comment>Text="Note: %3B is semicolon (;)</Comment>
+			<Comment>Text="Note: %3B is semicolon (;) and it is necessary because an actual semiclon breaks everything,
+			and the HTML entity 'semi' is not recognized.</Comment>
 			<_PathTemplate>
-#pragma warning disable IDE0001 //Name can be simplified
-#pragma warning disable IDE0055 //Fix formatting
-#pragma warning disable IDE0130 //Namespace does not match folder structure
+#pragma warning disable IDE0001 //Simplify name
+#pragma warning disable IDE0002 //Simplify member access
 namespace $(RootNamespace)%3B
 
 static class BuildProperties
@@ -207,6 +207,7 @@ static class BuildProperties
 		<Using Include="System.Linq" />
 		<Using Alias="ConcurrentCollections" Include="System.Collections.Concurrent" />
 		<Using Alias="LegacyCollections" Include="System.Collections" />
+		<Using Alias="ImmutableCollections" Include="System.Collections.Immutable" Condition="$([MSBuild]::IsTargetFrameworkCompatible($(TargetFramework), 'net8.0'))" />
 		<Using Alias="LinqExpr" Include="System.Linq.Expressions" />
 		<Using Alias="SpecializedCollections" Include="System.Collections.Specialized" />
 		<Using Alias="Math" Include="System.Math" />
