@@ -56,7 +56,7 @@ dotnet_diagnostic.IDE0007.severity = silent
 # IDE0008: "Use explicit type instead of 'var'"
 # Also see IDE0007: "Use 'var' instead of explicit type".
 # Also see IDE0090: "Simplify `new` expression" (a.k.a. "target-typed `new`")
-dotnet_diagnostic.IDE0008.severity = warning
+dotnet_diagnostic.IDE0008.severity = silent
 # Justification: Here is a rule worth living by:
 #    "Any choice that makes code easier to read is preferable over any choice that makes code easier to write".
 #    The use of `var` makes code easier to write, but not easier to read, because it often leaves the reader wondering
@@ -64,28 +64,20 @@ dotnet_diagnostic.IDE0008.severity = warning
 #    Script kiddies might object that on the contrary, explicitly stating the type of everything everywhere makes code
 #        harder to read, because types are just unnecessary noise to them, but script kiddies can go get a life.
 #    Therefore, never use `var` unless the type is obvious.
-#    The type is obvious only when assigning:
-#      - a literal of a built-in type. (e.g. `var a = "covfefe";`, `var a = 42;`, `var a = 5.0;`)
-#      - the result of `new`. (e.g. `var a = new Foo();`)
-#      - the result of a type-cast. (e.g. `var a = (int)b;`)
-#    - In the case of built-in types, there is nothing to be gained from saying `var a = 5;` vs. `int a = 5;`.
-#    - In the case of `new`, it is better to use target-typed new, as in `Foo a = new();`
-#    - In the case of a type-cast, we would like to be able to use `var`, but we cannot have that! see
-#      `csharp_style_var_when_type_is_apparent`.
+#    The type is obvious only in the following cases:
+#      - when assigning a literal of a built-in type. (e.g. `var a = "covfefe";`, `var a = 42;`, `var a = 5.0;`)
+#        (although there is very little to be gained by saying `var a = 5.0;` vs. `double a = 5.0;`
+#      - when assigning the result of `new`. (e.g. `var a = new Foo();`)
+#      - when assigning the result of a type-cast. (e.g. `var a = (int)b;`)
+#    In all other cases, feel free to momentarily use `var` when declaring a variable, and then immediately ask the IDE
+#        to refactor that `var` into the actual type.
 
 	# Options for IDE0007 and IDE0008
 	csharp_style_var_for_built_in_types = false
 	csharp_style_var_elsewhere = false
-	# PEARL: Ideally, we would like to allow the use of `var` when a variable receives the result of a type-cast,
-	#        but there is no option specifically for that.
-	#        Instead, there is this blanket option `csharp_style_var_when_type_is_apparent`.
-	#        However, if this option is set to `true`, the use of `var` is also allowed when the variable receives the
-	#        result of `new`, but when that is allowed, analysis will never suggest IDE0090: "Simplify `new` 
-	#        expression" (a.k.a. "target-typed `new`") which, I think, is more useful.
-	#        As a result of this, we cannot allow the use of `var` anywhere.
-	#        Feel free to momentarily use `var` when declaring a variable, and then immediately ask the IDE to refactor
-	#        that `var` into the actual type.
-	csharp_style_var_when_type_is_apparent = false
+	# PEARL: If this option is set to `true`, analysis will never suggest IDE0090: "Simplify `new` expression"
+	#        a.k.a. "target-typed `new`". It's okay, we do not care for target-typed `new` anyway.
+	csharp_style_var_when_type_is_apparent = true
 
 # IDE0009: "Add this or Me qualification"
 # Also see IDE0003: "Remove this or Me qualification"
@@ -2478,10 +2470,13 @@ dotnet_diagnostic.SYSLIB1229.severity = warning
 dotnet_diagnostic.CS0168.severity = warning
 
 # CS0612: 'member' is obsolete
-# dotnet_diagnostic.CS0612.severity = warning
+# PEARL: This is not issued on overriding methods! See https://stackoverflow.com/q/79432897/773113
+dotnet_diagnostic.CS0612.severity = warning
 
 # CS0618: "'member' is obsolete: 'text'"
-# dotnet_diagnostic.CS0618.severity = warning
+# PEARL: Although the almost identical warning CS0612 is level 1, this one is level 2. Go figure.
+# PEARL: This is not issued on overriding methods! See https://stackoverflow.com/q/79432897/773113
+dotnet_diagnostic.CS0618.severity = warning
 
 # CS1591: "Missing XML comment for publicly visible type or member '<>'"
 dotnet_diagnostic.CS1591.severity = none
