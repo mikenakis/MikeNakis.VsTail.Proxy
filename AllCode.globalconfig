@@ -56,13 +56,14 @@ dotnet_diagnostic.IDE0007.severity = silent
 # IDE0008: "Use explicit type instead of 'var'"
 # Also see IDE0007: "Use 'var' instead of explicit type".
 # Also see IDE0090: "Simplify `new` expression" (a.k.a. "target-typed `new`")
-dotnet_diagnostic.IDE0008.severity = silent
+dotnet_diagnostic.IDE0008.severity = warning
 # Justification: Here is a rule worth living by:
 #    "Any choice that makes code easier to read is preferable over any choice that makes code easier to write".
 #    The use of `var` makes code easier to write, but not easier to read, because it often leaves the reader wondering
 #    what is the exact type hidden by `var`.
-#    Script kiddies might object that on the contrary, explicitly stating the type of everything everywhere makes code
-#        harder to read, because types are just unnecessary noise to them, but script kiddies can go get a life.
+#    Script kiddies might object that on the contrary, explicitly stating the type makes code harder to read, because
+#        there is extra stuff to read, and the extra stuff is unimportant. Script kiddies say this because types are
+#        just unnecessary noise to them. Script kiddies can go get a life.
 #    Therefore, never use `var` unless the type is obvious.
 #    The type is obvious only in the following cases:
 #      - when assigning a literal of a built-in type. (e.g. `var a = "covfefe";`, `var a = 42;`, `var a = 5.0;`)
@@ -308,9 +309,16 @@ dotnet_diagnostic.IDE0045.severity = silent
 	dotnet_style_prefer_conditional_expression_over_assignment = true
 
 # IDE0046: "Use conditional expression for return" / "Convert to conditional expression"
+# PEARL: If you set the severity to anything other than `none` and the preference to `true` then you gain access to the
+#    refactoring which converts two return statements into a single return statement with a conditional expression;
+#    however, if you set the preference to `false` there is no refactoring that would performs the opposite conversion,
+#    and there exists no rule for the opposite intention.
 dotnet_diagnostic.IDE0046.severity = silent
+# Justification: the programmer must be free to choose whichever form they find more natural and should not even be
+#    bothered with a suggestion to change it; thus, the severity must be either `none` or `silent`.
+#    The associated refactoring is nice to have, so we set the severity to `silent` and set the preference to `true`.
 
-	dotnet_style_prefer_conditional_expression_over_return = false
+	dotnet_style_prefer_conditional_expression_over_return = true
 
 # IDE0047: "Remove unnecessary parentheses"
 # See also: IDE0048: "Add parentheses for clarity"
@@ -377,13 +385,6 @@ dotnet_diagnostic.IDE0054.severity = warning
 
 # IDE0055: "Formatting rule"
 # PEARL: this rule must be configured in .editorconfig, not in .globalconfig.
-#        To be fair, the documentation states that .globalconfig is for code analysis rules, not for formatting rules.
-#        However, this limitation appears to have been introduced in order to cover up for bugs:
-#        If you specify IDE0055 in .globalconfig instead of .editorconfig, the built-in formatter of Visual Studio will
-#        continue to work fine, and the "Format Code" option of the "Code Cleanup" command of Visual Studio will also
-#        continue to work fine, but `dotnet format` (and `dotnet format whitespace`) will completely mess up your code
-#        by applying all default formatting to it, because it is apparently unaware of .globalconfig.
-dotnet_diagnostic.IDE0055.severity = warning
 
 # IDE0056: "Use index operator"
 dotnet_diagnostic.IDE0056.severity = suggestion
