@@ -340,5 +340,6 @@ build_check.BC0201.severity=warning
 # BC0202: "A property should be declared before it is first used."
 build_check.BC0202.severity=warning
 
-# BC0203: "A property that is not used should not be declared" aka "Property: '<a>' was declared/initialized, but it was never used."
-build_check.BC0203.severity=warning
+# BC0203: " Property declared but never used." a.k.a. "A property that is not used should not be declared" a.k.a. "Property: '<a>' was declared/initialized, but it was never used."
+build_check.BC0203.severity=none
+# Justification: the documentation page says "it can have false positives - for this reasons[sic] it's currently not enabled by defaut."
