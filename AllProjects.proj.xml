@@ -120,9 +120,9 @@
 		<Message Importance="High" Text="TargetFramework: '$(TargetFramework)'; TargetPlatform: '$(TargetPlatform)'; RuntimeIdentifier: '$(RuntimeIdentifier)'" />
 	</Target>-->
 
-	<!-- Target Name="PrintStuff2" BeforeTargets="Compile">
+	 <!--<Target Name="PrintStuff2" BeforeTargets="Compile">
 		<Message Importance="High" Text="Configuration: '$(Configuration)'; DefineConstants: '$(DefineConstants)'" />
-	</Target -->
+	</Target>-->
 
 	<!--<Target Name="PrintStuff3" BeforeTargets="Compile">
 		<Message Importance="High" Text="IsTestProject: '$(IsTestProject)'" />
