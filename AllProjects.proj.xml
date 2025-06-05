@@ -63,7 +63,6 @@
 				<Optimize>False</Optimize>
 				<EnableNETAnalyzers>True</EnableNETAnalyzers>
 				<PackagesConfiguration>Develop</PackagesConfiguration>
-				<!-- embedded: Emit debugging information into the .dll/.exe itself (.pdb file is not produced) using Portable PDB format. -->
 				<DebugType>Portable</DebugType>
 			</PropertyGroup>
 		</When>
@@ -101,7 +100,6 @@
 				     edit-and-continue. (Strangely enough, if used on a debug build, breakpoints still work.) -->
 				<!-- PEARL: This property is UNDOCUMENTED. -->
 				<DeterministicSourcePaths>True</DeterministicSourcePaths>
-				<!-- portable: Emit debugging information to .pdb file using cross-platform Portable PDB format. -->
 				<DebugType>Portable</DebugType>
 			</PropertyGroup>
 		</When>
@@ -127,29 +125,6 @@
 	<!--<Target Name="PrintStuff3" BeforeTargets="Compile">
 		<Message Importance="High" Text="IsTestProject: '$(IsTestProject)'" />
 	</Target>-->
-
-	<Target Name="EmbedStartupProjectPath" BeforeTargets="BeforeBuild" Condition="('$(OutputType)' == 'Exe' OR '$(OutputType)' == 'WinExe') AND '$(IsTestProject)' == ''">
-		<PropertyGroup>
-			<Comment>Text="Note: %3B is semicolon (;) and it is necessary because an actual semiclon breaks everything,
-			and the HTML entity 'semi' is not recognized.</Comment>
-			<_PathTemplate>
-#pragma warning disable IDE0001 //Simplify name
-#pragma warning disable IDE0002 //Simplify member access
-namespace $(RootNamespace)%3B
-
-static class BuildProperties
-{
-#if RELEASE
-	//do nothing
-#else
-	[System.Runtime.CompilerServices.ModuleInitializer]
-	public static void Initialize() => MikeNakis.Kit.Log.SetStartupProjectDirectoryPathName( @"$(MSBuildProjectDirectory)" )%3B
-#endif
-}
-			</_PathTemplate>
-		</PropertyGroup>
-		<WriteLinesToFile File="BuildProperties.cs" Lines="$(_PathTemplate)" WriteOnlyWhenDifferent="true" Overwrite="true" />
-	</Target>
 
 	<PropertyGroup Condition="'$(EnableNETAnalyzers)' == 'True'">
 		<AnalysisLevel>latest-Recommended</AnalysisLevel>
