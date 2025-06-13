@@ -63,16 +63,18 @@
 				<Optimize>False</Optimize>
 				<EnableNETAnalyzers>True</EnableNETAnalyzers>
 				<PackagesConfiguration>Develop</PackagesConfiguration>
-				<DebugType>Portable</DebugType>
+				<DebugType>Full</DebugType>
 			</PropertyGroup>
 		</When>
 		<When Condition="'$(Configuration)'=='Optimized'">
 			<PropertyGroup>
-				<DefineConstants>$(DefineConstants);PRECONDITIONS</DefineConstants>
-				<CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+				<DefineConstants>$(DefineConstants);PRECONDITIONS;ASSERTIONS</DefineConstants>
+				<CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
 				<Optimize>True</Optimize>
 				<EnableNETAnalyzers>True</EnableNETAnalyzers>
 				<PackagesConfiguration>Develop</PackagesConfiguration>
+				<DebugType>Full</DebugType>
+				<OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
 			</PropertyGroup>
 		</When>
 		<When Condition="'$(Configuration)'=='Develop'">
@@ -82,8 +84,8 @@
 				<Optimize>True</Optimize>
 				<EnableNETAnalyzers>False</EnableNETAnalyzers>
 				<PackagesConfiguration>Release</PackagesConfiguration>
-				<DefineDebug>False</DefineDebug>
-				<DefineTrace>True</DefineTrace>
+				<DebugType>Portable</DebugType>
+				<OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
 			</PropertyGroup>
 		</When>
 		<When Condition="'$(Configuration)'=='Release'">
@@ -93,6 +95,7 @@
 				<Optimize>True</Optimize>
 				<EnableNETAnalyzers>False</EnableNETAnalyzers>
 				<PackagesConfiguration>Release</PackagesConfiguration>
+				<DebugType>Portable</DebugType>
 				<Deterministic>True</Deterministic>
 				<!-- This property acts like PathMap replacing $(MSBuildProjectDirectory) with '/_/', thus removing
 				     from source paths information that depends on the machine that the code was compiled in. -->
@@ -100,19 +103,15 @@
 				     edit-and-continue. (Strangely enough, if used on a debug build, breakpoints still work.) -->
 				<!-- PEARL: This property is UNDOCUMENTED. -->
 				<DeterministicSourcePaths>True</DeterministicSourcePaths>
-				<DebugType>Portable</DebugType>
 			</PropertyGroup>
 		</When>
 		<Otherwise>
-			<PropertyGroup>
-				<ConfigurationIsInvalid>True</ConfigurationIsInvalid>
-			</PropertyGroup>
+			<!-- PEARL: MSBuild does not allow an <Error> here, nor a <Task> with an <Error>, so, screw you MSBuild, this will do it. -->
+			<ItemGroup>
+                 <PackageReference Include="=== Invalid configuration: '$(Configuration)' ===" Version="1.0.1" />
+			</ItemGroup>			
 		</Otherwise>
 	</Choose>
-
-	<Target Name="ValidateBuildConfiguration" BeforeTargets="Compile" Condition="'$(ConfigurationIsInvalid)'!=''">
-		<Error Text="Invalid configuration: '$(Configuration)'" />
-	</Target>
 
 	<!--<Target Name="PrintStuff1" BeforeTargets="Compile">
 		<Message Importance="High" Text="TargetFramework: '$(TargetFramework)'; TargetPlatform: '$(TargetPlatform)'; RuntimeIdentifier: '$(RuntimeIdentifier)'" />
