@@ -74,7 +74,7 @@
 				<EnableNETAnalyzers>True</EnableNETAnalyzers>
 				<PackagesConfiguration>Develop</PackagesConfiguration>
 				<DebugType>Full</DebugType>
-				<OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
+				<OutputPath>bin\$(Configuration)\</OutputPath>
 			</PropertyGroup>
 		</When>
 		<When Condition="'$(Configuration)'=='Develop'">
@@ -85,7 +85,7 @@
 				<EnableNETAnalyzers>False</EnableNETAnalyzers>
 				<PackagesConfiguration>Release</PackagesConfiguration>
 				<DebugType>Portable</DebugType>
-				<OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
+				<OutputPath>bin\$(Configuration)\</OutputPath>
 			</PropertyGroup>
 		</When>
 		<When Condition="'$(Configuration)'=='Release'">
