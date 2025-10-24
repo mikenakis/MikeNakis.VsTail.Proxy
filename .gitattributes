@@ -1,0 +1,5 @@
+# Set default behaviour, in case core.autocrlf is not properly set.
+* text=auto working-tree-encoding=UTF-8
+
+# Set audit files to always have lf endings
+*.audit text eol=lf

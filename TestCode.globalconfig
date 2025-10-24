@@ -1,0 +1,51 @@
+# Global AnalyzerConfig
+# https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/configuration-files#global-analyzerconfig
+
+is_global = true
+
+# IDE0100: "Remove unnecessary equality operator" a.k.a. "Remove redundant equality"
+dotnet_diagnostic.IDE0100.severity = none
+# Justification: In tests it is often more expressive to say `Assert( object.property == false );`.
+
+# CA1707: "Identifiers should not contain underscores"
+# PEARL: This will affect all identifiers, including namespace names; however, root namespace names are computed, by
+#        default, from the name of the module by replacing spaces with underscores. So, if the name of the assembly
+#        contains a space, then the root namespace will contain an underscore.
+#        Test assembly names must contain spaces because that is the only way to guarantee that the order in which 
+#        projets are listed in solution explorer in the same as the order in which they are listed in windows file
+#        explorer.
+# PEARL: To set the severity, we have to use 'dotnet_diagnostic.CA1707.severity', but to set the api surface, we have
+#        to use 'dotnet_code_quality.CA1707.api_surface'! Go figure.
+dotnet_diagnostic.CA1707.severity = none
+# Justification: Underscores are allowed in test method names, in test class names, and in test namespaces.
+
+	dotnet_code_quality.CA1707.api_surface = all
+
+# CA1515: "Consider making public types internal"
+dotnet_diagnostic.CA1515.severity = none
+# Justification: In test projects, test classes must be public even though they are not instantiated by us. Note that
+#    there is no way to specify this only for test classes, so it affects all classes.
+
+# General syntax:
+# dotnet_naming_style.<StyleName>.capitalization = one of: pascal_case, camel_case, first_word_upper, all_upper, all_lower
+# dotnet_naming_style.<StyleName>.required_prefix = <string>
+# dotnet_naming_style.<StyleName>.required_suffix = <string>
+# dotnet_naming_style.<StyleName>.word_separator = <string>
+# dotnet_naming_symbols.<SymbolsName>.applicable_kinds = one of: *, namespace, class, struct, interface, enum, property, method, field, event, delegate, parameter, type_parameter, local, local_function
+# dotnet_naming_symbols.<SymbolsName>.applicable_accessibilities = one of: *, public, internal or friend, private, protected, protected_internal or protected_friend, private_protected, local
+# dotnet_naming_symbols.<SymbolsName>.required_modifiers = one of: abstract or must_inherit, async, const, readonly, static or shared
+# dotnet_naming_rule.<RuleName>.style = <StyleName>
+# dotnet_naming_rule.<RuleName>.symbols = <SymbolsName>
+# dotnet_naming_rule.<RuleName>.severity = one of: error, warning, suggestion, silent, none, default
+# NOTE: You must specify a capitalization style as part of your naming style, otherwise your naming style might be ignored.
+
+dotnet_naming_style.test_method_style.capitalization = pascal_case
+#dotnet_naming_style.test_method_style.required_prefix = T
+dotnet_naming_style.test_method_style.word_separator = _
+
+dotnet_naming_symbols.test_methods.applicable_kinds            = method
+dotnet_naming_symbols.test_methods.applicable_accessibilities  = public
+
+dotnet_naming_rule.test_methods_should_be_appropriately_named.severity = warning
+dotnet_naming_rule.test_methods_should_be_appropriately_named.symbols  = test_methods
+dotnet_naming_rule.test_methods_should_be_appropriately_named.style    = test_method_style

@@ -177,45 +177,13 @@
 
 	<ItemGroup>
 		<!-- For the `IsTargetFrameworkCompatible()` magic, see https://stackoverflow.com/a/79605485/773113 -->
-		<Using Include="System.Collections.Generic" />
-		<Using Include="System.Linq" />
-		<Using Alias="ConcurrentCollections" Include="System.Collections.Concurrent" />
-		<Using Alias="LegacyCollections" Include="System.Collections" />
 		<Using Alias="ImmutableCollections" Include="System.Collections.Immutable" Condition="$([MSBuild]::IsTargetFrameworkCompatible($(TargetFramework), 'net8.0'))" />
-		<Using Alias="LinqExpr" Include="System.Linq.Expressions" />
-		<Using Alias="SpecializedCollections" Include="System.Collections.Specialized" />
-		<Using Alias="Math" Include="System.Math" />
-		<Using Alias="RegEx" Include="System.Text.RegularExpressions" />
-		<Using Alias="Sys" Include="System" />
-		<Using Alias="SysCodeAnalysis" Include="System.Diagnostics.CodeAnalysis" />
-		<Using Alias="SysCompiler" Include="System.Runtime.CompilerServices" />
-		<Using Alias="SysCompModel" Include="System.ComponentModel" />
-		<Using Alias="SysCompress" Include="System.IO.Compression" />
-		<Using Alias="SysConfig" Include="System.Configuration" />
-		<Using Alias="SysContracts" Include="System.Diagnostics.Contracts" />
-		<Using Alias="SysCrypto" Include="System.Security.Cryptography" />
-		<Using Alias="SysDiag" Include="System.Diagnostics" />
-		<Using Alias="SysDraw" Include="System.Drawing" />
-		<Using Alias="SysGlob" Include="System.Globalization" />
 		<Using Alias="SysHttp" Include="System.Net.Http" Condition="$([MSBuild]::IsTargetFrameworkCompatible('netstandard2.0', $(TargetFramework)))" />
 		<!-- PEARL: the question of whether System.Drawing.Imaging is available or not is immensely complicated!
 		            see https://learn.microsoft.com/en-us/dotnet/api/system.drawing.imaging
 					The only solution to this problem is to have it explicitly imported by each source file that needs it. -->
 		<!-- <Using Alias="SysImage" Include="System.Drawing.Imaging" />-->
-		<Using Alias="SysInterop" Include="System.Runtime.InteropServices" />
-		<Using Alias="SysIo" Include="System.IO" />
-		<Using Alias="SysIoPipes" Include="System.IO.Pipes" />
 		<Using Alias="SysJson" Include="System.Text.Json" Condition="$([MSBuild]::IsTargetFrameworkCompatible('netcore3.0', $(TargetFramework)))" />
-		<Using Alias="SysNet" Include="System.Net" />
-		<Using Alias="SysNum" Include="System.Numerics" />
-		<Using Alias="SysObjModel" Include="System.Collections.ObjectModel" />
-		<Using Alias="SysReflect" Include="System.Reflection" />
-		<Using Alias="SysTask" Include="System.Threading.Tasks" />
-		<Using Alias="SysText" Include="System.Text" />
-		<Using Alias="SysThread" Include="System.Threading" />
-		<Using Alias="SysXml" Include="System.Xml" />
-		<Using Alias="SysXmlLinq" Include="System.Xml.Linq" />
-		<Using Static="True" Include="System.Xml.XPath.Extensions" />
 		<Using Static="True" Include="System.MemoryExtensions" Condition="$([MSBuild]::IsTargetFrameworkCompatible($(TargetFramework), 'net8.0'))" />
 		<Using Static="True" Include="System.Threading.Tasks.TaskAsyncEnumerableExtensions" Condition="$([MSBuild]::IsTargetFrameworkCompatible($(TargetFramework), 'net8.0'))" />
 
@@ -242,6 +210,7 @@
 		<!-- WinForms stuff. -->
 		<Using Alias="WinForms" Include="System.Windows.Forms" Condition="$(UseWindowsForms)=='True'" />
 
+		<Compile Include="..\GlobalUsings.cs" />
 	</ItemGroup>
 
 </Project>

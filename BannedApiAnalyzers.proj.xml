@@ -1,0 +1,15 @@
+<Project>
+
+	<Target Name="AssertFileExists" BeforeTargets="BeforeBuild">
+		<Error Message="BannedSymbols.txt does not exist. Please create a hard-link to MikeNakis.CommonFiles\BannedSymbols.txt" Condition="!Exists( '$(MSBuildThisFileDirectory)\BannedSymbols.txt' )" />
+	</Target>
+
+	<ItemGroup Condition="'$(Configuration)'=='Debug'">
+		<PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="3.3.4" Condition="'$(Configuration)' == 'Debug'">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+		</PackageReference>
+		<AdditionalFiles Include="$(MSBuildThisFileDirectory)\BannedSymbols.txt" />
+	</ItemGroup>
+
+</Project>
