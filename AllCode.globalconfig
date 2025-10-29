@@ -1082,13 +1082,16 @@ dotnet_diagnostic.CA1052.severity = suggestion
 dotnet_diagnostic.CA1053.severity = warning
 
 # CA1054: "Uri parameters should not be strings"
-dotnet_diagnostic.CA1054.severity = warning
+dotnet_diagnostic.CA1054.severity = silent
+# Justification: #AintNoBodyGotNoTimeFoDat
 
 # CA1055: "Uri return values should not be strings"
-dotnet_diagnostic.CA1055.severity = warning
+dotnet_diagnostic.CA1055.severity = silent
+# Justification: #AintNoBodyGotNoTimeFoDat
 
 # CA1056: "Uri properties should not be strings"
-dotnet_diagnostic.CA1056.severity = warning
+dotnet_diagnostic.CA1056.severity = silent
+# Justification: #AintNoBodyGotNoTimeFoDat
 
 # CA1058: "Types should not extend certain base types"
 dotnet_diagnostic.CA1058.severity = warning

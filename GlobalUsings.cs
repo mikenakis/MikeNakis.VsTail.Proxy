@@ -24,6 +24,7 @@ global using SysInterop = System.Runtime.InteropServices;
 global using SysIo = System.IO;
 global using SysIoPipes = System.IO.Pipes;
 global using SysNet = System.Net;
+global using SysSockets = System.Net.Sockets;
 global using SysNum = System.Numerics;
 global using SysObjModel = System.Collections.ObjectModel;
 global using SysReflect = System.Reflection;
