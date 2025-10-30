@@ -196,7 +196,11 @@ dotnet_diagnostic.IDE0027.severity = warning
 	csharp_style_expression_bodied_accessors = when_on_single_line
 
 # IDE0028: "Use collection initializers"
-dotnet_diagnostic.IDE0028.severity = silent
+# PEARL: We would like to set this to 'silent' instead of 'none', so that the refactoring is available, but when this is
+#   set to 'silent', fucking lame stupid Visual Studio will go apply different highlighting to the initialization
+#   statements that would be affected if the refactoring was applied. This is not particularly silent, is it? Fucking
+#   morons.
+dotnet_diagnostic.IDE0028.severity = none
 
 	dotnet_style_collection_initializer = true
 
