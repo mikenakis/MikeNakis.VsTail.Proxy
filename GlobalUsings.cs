@@ -1,7 +1,6 @@
 #pragma warning disable IDE0005 // Using directive is unnecessary.
 
 global using System.Collections.Generic;
-global using System.Collections.Immutable;
 global using System.Linq;
 global using static System.Xml.XPath.Extensions;
 global using ConcurrentCollections = System.Collections.Concurrent;
