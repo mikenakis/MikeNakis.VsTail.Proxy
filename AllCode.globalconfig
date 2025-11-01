@@ -1732,7 +1732,8 @@ dotnet_diagnostic.CA2231.severity = none
 # Justification: Not a warning because #AintNoBodyGotNoTimeFoDat.
 
 # CA2234: "Pass system uri objects instead of strings"
-dotnet_diagnostic.CA2234.severity = warning
+dotnet_diagnostic.CA2234.severity = none
+# Justification: Not a warning because #AintNoBodyGotNoTimeFoDat.
 
 # CA2235: "Mark all non-serializable fields"
 dotnet_diagnostic.CA2235.severity = warning
@@ -1936,7 +1937,8 @@ dotnet_diagnostic.CA3077.severity = warning
 dotnet_diagnostic.CA3147.severity = warning
 
 # CA5350: "Do Not Use Weak Cryptographic Algorithms"
-dotnet_diagnostic.CA5350.severity = warning
+dotnet_diagnostic.CA5350.severity = none
+# Justification: There is a place and a time for weak cryptographic algorithms .
 
 # CA5351: "Do Not Use Broken Cryptographic Algorithms"
 dotnet_diagnostic.CA5351.severity = warning
