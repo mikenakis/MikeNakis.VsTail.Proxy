@@ -175,42 +175,4 @@
 		<!--<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All"/>-->
 	</ItemGroup>
 
-	<ItemGroup>
-		<!-- For the `IsTargetFrameworkCompatible()` magic, see https://stackoverflow.com/a/79605485/773113 -->
-		<Using Alias="ImmutableCollections" Include="System.Collections.Immutable" Condition="$([MSBuild]::IsTargetFrameworkCompatible($(TargetFramework), 'net8.0'))" />
-		<Using Alias="SysHttp" Include="System.Net.Http" Condition="$([MSBuild]::IsTargetFrameworkCompatible('netstandard2.0', $(TargetFramework)))" />
-		<!-- PEARL: the question of whether System.Drawing.Imaging is available or not is immensely complicated!
-		            see https://learn.microsoft.com/en-us/dotnet/api/system.drawing.imaging
-					The only solution to this problem is to have it explicitly imported by each source file that needs it. -->
-		<!-- <Using Alias="SysImage" Include="System.Drawing.Imaging" />-->
-		<Using Alias="SysJson" Include="System.Text.Json" Condition="$([MSBuild]::IsTargetFrameworkCompatible('netcore3.0', $(TargetFramework)))" />
-		<Using Static="True" Include="System.MemoryExtensions" Condition="$([MSBuild]::IsTargetFrameworkCompatible($(TargetFramework), 'net8.0'))" />
-		<Using Static="True" Include="System.Threading.Tasks.TaskAsyncEnumerableExtensions" Condition="$([MSBuild]::IsTargetFrameworkCompatible($(TargetFramework), 'net8.0'))" />
-
-		<!-- "Xps" stuff probably belongs to WPF, but it is not entirely clear, so let's prefix it with 'Sys' instead of 'Wpf'. -->
-		<Using Alias="SysXps" Include="System.Windows.Xps" Condition="$(UseWPF)=='True'" />
-		<Using Alias="SysXpsPackaging" Include="System.Windows.Xps.Packaging" Condition="$(UseWPF)=='True'" />
-
-		<!-- WPF stuff. -->
-		<Using Alias="Wpf" Include="System.Windows" Condition="$(UseWPF)=='True'" />
-		<Using Alias="WpfAnimation" Include="System.Windows.Media.Animation" Condition="$(UseWPF)=='True'" />
-		<Using Alias="WpfControls" Include="System.Windows.Controls" Condition="$(UseWPF)=='True'" />
-		<Using Alias="WpfData" Include="System.Windows.Data" Condition="$(UseWPF)=='True'" />
-		<Using Alias="WpfDocuments" Include="System.Windows.Documents" Condition="$(UseWPF)=='True'" />
-		<Using Alias="WpfInput" Include="System.Windows.Input" Condition="$(UseWPF)=='True'" />
-		<Using Alias="WpfInterop" Include="System.Windows.Interop" Condition="$(UseWPF)=='True'" />
-		<Using Alias="WpfMarkup" Include="System.Windows.Markup" Condition="$(UseWPF)=='True'" />
-		<Using Alias="WpfMedia" Include="System.Windows.Media" Condition="$(UseWPF)=='True'" />
-		<Using Alias="WpfNavigation" Include="System.Windows.Navigation" Condition="$(UseWPF)=='True'" />
-		<Using Alias="WpfPrimitives" Include="System.Windows.Controls.Primitives" Condition="$(UseWPF)=='True'" />
-		<Using Alias="WpfResources" Include="System.Windows.Resources" Condition="$(UseWPF)=='True'" />
-		<Using Alias="WpfShapes" Include="System.Windows.Shapes" Condition="$(UseWPF)=='True'" />
-		<Using Alias="WpfThreading" Include="System.Windows.Threading" Condition="$(UseWPF)=='True'" />
-
-		<!-- WinForms stuff. -->
-		<Using Alias="WinForms" Include="System.Windows.Forms" Condition="$(UseWindowsForms)=='True'" />
-
-		<Compile Include="..\GlobalUsings.cs" />
-	</ItemGroup>
-
 </Project>

@@ -1,5 +1,11 @@
 namespace MikeNakis.VsTail.Proxy;
 
+using Sys = System;
+using SysDiag = System.Diagnostics;
+using SysIo = System.IO;
+using SysIoPipes = System.IO.Pipes;
+using SysText = System.Text;
+
 /// <summary>
 /// Connects to VsTail.
 /// </summary>
