@@ -40,9 +40,17 @@
 		<!-- Justification: It is perfectly fine for an obsolete member to override a non-obsolete member. We do so
 		     intentionally all over the place. This warning is junk. -->
 
-		<!-- PEARL: these two seem to have absolutely no effect, whether you set them to True or False -->
+		<!-- PEARL: The DefineDebug and DefineTrace magical incantations are mentioned by official documentation but
+		     have absolutely no effect. A more meticulous search though the apocryphal sriptures reveals that the
+			 DisableImplicitConfigurationDefines and DisableDiagnosticTracing magical incantations must be used instead.
+			 (See below.) -->
 		<DefineDebug>False</DefineDebug>
 		<DefineTrace>False</DefineTrace>
+
+		<!-- PEARL: The DisableImplicitConfigurationDefines and DisableDiagnosticTracing magical incantations are
+		     necessary to prevent 'DEBUG' and 'TRACE' from being automagically predefined. -->
+		<DisableImplicitConfigurationDefines>True</DisableImplicitConfigurationDefines>
+		<DisableDiagnosticTracing>True</DisableDiagnosticTracing>
 
 		<!-- This enables some extra build-time checking of MSBuild project files. It is very half-assed but they might
 		     improve it over time. -->
@@ -57,8 +65,7 @@
 	<Choose>
 		<When Condition="'$(Configuration)'=='Debug'">
 			<PropertyGroup>
-				<!-- PEARL: DEBUG and TRACE have already been defined and they would be defined even if we did not want them to -->
-				<DefineConstants>$(DefineConstants);PRECONDITIONS;ASSERTIONS</DefineConstants>
+				<DefineConstants>$(DefineConstants);DEBUG;PRECONDITIONS;ASSERTIONS</DefineConstants>
 				<CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
 				<Optimize>False</Optimize>
 				<EnableNETAnalyzers>True</EnableNETAnalyzers>
@@ -68,7 +75,7 @@
 		</When>
 		<When Condition="'$(Configuration)'=='Optimized'">
 			<PropertyGroup>
-				<DefineConstants>$(DefineConstants);PRECONDITIONS;ASSERTIONS</DefineConstants>
+				<DefineConstants>$(DefineConstants);DEBUG;PRECONDITIONS;ASSERTIONS</DefineConstants>
 				<CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
 				<Optimize>True</Optimize>
 				<EnableNETAnalyzers>True</EnableNETAnalyzers>
@@ -79,7 +86,7 @@
 		</When>
 		<When Condition="'$(Configuration)'=='Develop'">
 			<PropertyGroup>
-				<DefineConstants>$(DefineConstants);PRECONDITIONS</DefineConstants>
+				<DefineConstants>$(DefineConstants);DEBUG;PRECONDITIONS</DefineConstants>
 				<CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
 				<Optimize>True</Optimize>
 				<EnableNETAnalyzers>False</EnableNETAnalyzers>
@@ -90,7 +97,7 @@
 		</When>
 		<When Condition="'$(Configuration)'=='Release'">
 			<PropertyGroup>
-				<DefineConstants>$(DefineConstants)</DefineConstants>
+				<DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
 				<CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
 				<Optimize>True</Optimize>
 				<EnableNETAnalyzers>False</EnableNETAnalyzers>
@@ -117,13 +124,9 @@
 		<Message Importance="High" Text="TargetFramework: '$(TargetFramework)'; TargetPlatform: '$(TargetPlatform)'; RuntimeIdentifier: '$(RuntimeIdentifier)'" />
 	</Target>-->
 
-	 <!--<Target Name="PrintStuff2" BeforeTargets="Compile">
-		<Message Importance="High" Text="Configuration: '$(Configuration)'; DefineConstants: '$(DefineConstants)'" />
-	</Target>-->
-
-	<!--<Target Name="PrintStuff3" BeforeTargets="Compile">
-		<Message Importance="High" Text="IsTestProject: '$(IsTestProject)'" />
-	</Target>-->
+	 <Target Name="PrintStuff2" BeforeTargets="CoreCompile">
+		<Message Importance="High" Text="Configuration: '$(Configuration)'; IsTestProject: '$(IsTestProject)'; DefineConstants: '$(DefineConstants)'" />
+	</Target>
 
 	<PropertyGroup Condition="'$(EnableNETAnalyzers)' == 'True'">
 		<AnalysisLevel>latest-Recommended</AnalysisLevel>
