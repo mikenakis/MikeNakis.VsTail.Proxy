@@ -4,3 +4,4 @@
 *.user
 *wpftmp.csproj
 .*.testana.json
+/local-build*.bat
