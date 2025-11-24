@@ -63,7 +63,7 @@
 	</PropertyGroup>
 
 	<Choose>
-		<When Condition="'$(Configuration)'=='Debug'">
+		<When Condition="'$(Configuration)' == 'Debug'">
 			<PropertyGroup>
 				<DefineConstants>$(DefineConstants);DEBUG;PRECONDITIONS;ASSERTIONS</DefineConstants>
 				<CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
@@ -73,7 +73,7 @@
 				<DebugType>Full</DebugType>
 			</PropertyGroup>
 		</When>
-		<When Condition="'$(Configuration)'=='Optimized'">
+		<When Condition="'$(Configuration)' == 'Optimized'">
 			<PropertyGroup>
 				<DefineConstants>$(DefineConstants);DEBUG;PRECONDITIONS;ASSERTIONS</DefineConstants>
 				<CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
@@ -84,7 +84,7 @@
 				<OutputPath>bin\$(Configuration)\</OutputPath>
 			</PropertyGroup>
 		</When>
-		<When Condition="'$(Configuration)'=='Develop'">
+		<When Condition="'$(Configuration)' == 'Develop'">
 			<PropertyGroup>
 				<DefineConstants>$(DefineConstants);DEBUG;PRECONDITIONS</DefineConstants>
 				<CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
@@ -95,7 +95,7 @@
 				<OutputPath>bin\$(Configuration)\</OutputPath>
 			</PropertyGroup>
 		</When>
-		<When Condition="'$(Configuration)'=='Release'">
+		<When Condition="'$(Configuration)' == 'Release'">
 			<PropertyGroup>
 				<DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
 				<CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
@@ -162,11 +162,11 @@
 	</ItemGroup>
 
 	<!-- https://github.com/coverlet-coverage/coverlet -->
-	<ItemGroup Condition="'$(Configuration)'=='Debug' AND '$(IsTestProject)' == 'True'">
+	<ItemGroup Condition="'$(Configuration)' == 'Debug' AND '$(IsTestProject)' == 'True'">
 		<PackageReference Include="coverlet.collector" Version="6.0.4"/>
 	</ItemGroup>
 
-	<ItemGroup Condition="'$(IsTestProject)'=='True'">
+	<ItemGroup Condition="'$(IsTestProject)' == 'True'">
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
 		<PackageReference Include="MSTest.TestAdapter" Version="3.6.2" />
 		<PackageReference Include="MSTest.TestFramework" Version="3.6.2" />
