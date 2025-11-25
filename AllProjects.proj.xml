@@ -90,7 +90,7 @@
 				<CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
 				<Optimize>True</Optimize>
 				<EnableNETAnalyzers>False</EnableNETAnalyzers>
-				<PackagesConfiguration>Release</PackagesConfiguration>
+				<PackagesConfiguration>Develop</PackagesConfiguration>
 				<DebugType>Portable</DebugType>
 				<OutputPath>bin\$(Configuration)\</OutputPath>
 			</PropertyGroup>
