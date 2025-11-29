@@ -1,7 +1,18 @@
+# The settings directory that Visual Studio creates under the solution directory.
 .vs
+
+# All the bin and obj directories in all projects
 **/bin/**
 **/obj/**
+
+# User-specific configuration files
 *.user
+
+# Temporary project files that MSBuild carelessly spits out when building WPF projects and never bothers to delete.
 *wpftmp.csproj
+
+# Testana persistence files
 .*.testana.json
+
+# Local-build files (they contain secrets so they must never be committed.)
 /local-build*.bat
