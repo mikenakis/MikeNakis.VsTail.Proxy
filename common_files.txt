@@ -6,6 +6,7 @@ AllProjects.proj.xml
 BannedApiAnalyzers.proj.xml 
 BannedSymbols.txt 
 definitions.bash 
+get_common_files.bash
 get_version.bash 
 ProductionCode.globalconfig 
 TestCode.globalconfig 
