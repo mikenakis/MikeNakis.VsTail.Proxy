@@ -1,0 +1,11 @@
+.editorconfig 
+.gitignore
+.gitattributes
+AllCode.globalconfig 
+AllProjects.proj.xml 
+BannedApiAnalyzers.proj.xml 
+BannedSymbols.txt 
+definitions.bash 
+get_version.bash 
+ProductionCode.globalconfig 
+TestCode.globalconfig 

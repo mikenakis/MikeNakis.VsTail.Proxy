@@ -5,27 +5,26 @@ echo "This script is meant to be sourced from other scripts; it is not meant to 
 set -o errexit # Fail if any command has a non-zero exit status. Equivalent to `-e`. PEARL: it still won't fail if any of the following `set` commands fails.
 set -o nounset # Fail if an undefined variable is referenced. Equivalent to `-u`.
 set -o pipefail # Prevent pipelines from masking errors. (Use `command1 | command2 || true` to mask.)
-set -C # do not overwrite an existing file when redirecting. use >| instead of > to override.
+set -C # do not overwrite an existing file when redirecting. use `>|` instead of `>` to override.
 shopt -s expand_aliases # Do not ignore aliases. (What kind of idiot made ignoring aliases the default behavior?)
 #shopt -s extglob # enable extended pattern matching.
 
 PS4='+ $LINENO: ' # See https://stackoverflow.com/a/17805088/773113
 # set -x # enable echoing commands for the purpose of troubleshooting.
 
-declare self=$(realpath --relative-to="$PWD" "$0")
+declare -r global_self=$(realpath --relative-to="$PWD" "$0")
 
-alias info='log "$self" "$LINENO" INFO'
-alias warn='log "$self" "$LINENO" WARN'
-alias error='log "$self" "$LINENO" ERROR'
+alias info='log "$global_self" $LINENO INFO'
+alias warn='log "$global_self" $LINENO WARN'
+alias error='log "$global_self" $LINENO ERROR'
 
 function log()
 {
-	local self=$1; shift
-	local line=$1; shift
-	local level=$1; shift
-	local format="$1"; shift
-
-	declare -r message=$(printf "$format" $@)
+	declare -r self=$1; shift
+	declare -r line=$1; shift
+	declare -r level=$1; shift
+	declare -r message=$*
+	
 	printf "%s(%s): %s: %s\n" "$self" "$line" "$level" "$message"
 }
 
@@ -52,7 +51,7 @@ function increment_version()
 			patch=$((patch+1))
 			;;
 		*)
-			error "Invalid argument: '%s'" "$part_to_increment"
+			error "Invalid argument: '$part_to_increment'"
 			exit 1
 	esac
 	printf "%s.%s.%s" "$major" "$minor" "$patch"
@@ -106,7 +105,14 @@ function get_xml_value()
 {
 	declare -r file=$1
 	declare -r element=$2
+	declare -r default=${3-}
 
 	# Voodoo magick from Stack Overflow: "Extract XML Value in bash script" https://stackoverflow.com/a/17334043/773113
-	cat $file | sed -ne "/$element/{s/.*<$element>\(.*\)<\/$element>.*/\1/p;q;}"
+	declare -r value=$(cat $file | sed -ne "/$element/{s/.*<$element>\(.*\)<\/$element>.*/\1/p;q;}")
+
+	if [[ -z "$value" ]]; then
+		value=default
+	fi
+
+	printf $value
 }

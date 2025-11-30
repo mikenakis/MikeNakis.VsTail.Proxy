@@ -25,7 +25,7 @@ function run()
 	fi
 
 	if [[ ! -f $version_file_pathname ]]; then
-		error "File not found: '%s'" "$version_file_pathname"
+		error "File not found: '$version_file_pathname'"
 		exit 1
 	fi
 
