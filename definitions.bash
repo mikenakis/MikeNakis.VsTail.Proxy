@@ -12,15 +12,14 @@ shopt -s expand_aliases # Do not ignore aliases. (What kind of idiot made ignori
 PS4='+ $LINENO: ' # See https://stackoverflow.com/a/17805088/773113
 # set -x # enable echoing commands for the purpose of troubleshooting.
 
-declare -r global_self=$(realpath --relative-to="$PWD" "$0")
-
-alias info='log "$global_self" $LINENO INFO'
-alias warn='log "$global_self" $LINENO WARN'
-alias error='log "$global_self" $LINENO ERROR'
+alias info='log "${BASH_SOURCE[0]}" $LINENO INFO'
+alias warn='log "${BASH_SOURCE[0]}" $LINENO WARN'
+alias error='log "${BASH_SOURCE[0]}" $LINENO ERROR'
 
 function log()
 {
-	declare -r self=$1; shift
+	local -; set +x
+	declare -r self=$(realpath --relative-to="$PWD" "$1"); shift
 	declare -r line=$1; shift
 	declare -r level=$1; shift
 	declare -r message=$*
@@ -30,28 +29,32 @@ function log()
 
 function increment_version()
 {
-	declare -r part_to_increment=$1
-	declare -r version=$2
+	declare -r version=$1
+	declare part_to_increment=${2-}
 
+	if [[ "$part_to_increment" == "" ]]; then
+		part_to_increment="patch"
+	fi
+	
 	declare -i major
 	declare -i minor
 	declare -i patch
 	IFS=. read -r major minor patch <<< "$version"
 	case "$part_to_increment" in
-		"increment_major")
+		"major")
 			major=$((major+1))
 			minor=0
 			patch=0
 			;;
-		"increment_minor")
+		"minor")
 			minor=$((minor+1))
 			patch=0
 			;;
-		"increment_patch")
+		"patch")
 			patch=$((patch+1))
 			;;
 		*)
-			error "Invalid argument: '$part_to_increment'"
+			error "Invalid increment: '$part_to_increment'; expected 'major', 'minor', or 'patch' (the default)"
 			exit 1
 	esac
 	printf "%s.%s.%s" "$major" "$minor" "$patch"
@@ -108,11 +111,46 @@ function get_xml_value()
 	declare -r default=${3-}
 
 	# Voodoo magick from Stack Overflow: "Extract XML Value in bash script" https://stackoverflow.com/a/17334043/773113
-	declare -r value=$(cat $file | sed -ne "/$element/{s/.*<$element>\(.*\)<\/$element>.*/\1/p;q;}")
+	declare value=$(cat $file | sed -ne "/$element/{s/.*<$element>\(.*\)<\/$element>.*/\1/p;q;}")
 
 	if [[ -z "$value" ]]; then
 		value="$default"
 	fi
 
 	printf "$value"
+}
+
+function git_get_last_commit_message()
+{
+	# PEARL: as the case is with virtually all git commands, the git command that prints the last commit message looks
+	#   absolutely nothing like a command that would print the last commit message. Linus Torvalds you are not just a
+	#   geek, you are a fucking dork.
+	# from https://stackoverflow.com/a/7293026/773113
+	# and https://stackoverflow.com/questions/7293008/display-last-git-commit-comment#comment105325732_7293026
+	git log -1 --pretty=format:%B
+}
+
+function run_this_script_in_its_directory()
+{
+	declare -r directory=$(dirname $(realpath $0))
+	if [[ "$directory" != "$PWD" ]]; then
+		(cd "$directory"; bash $(basename $0) $@)
+		exit $?
+	fi
+}
+
+function join
+{
+	declare -r delimiter=$1
+	shift
+
+	declare result=""
+	declare delimiter_to_use=""
+	while [ $# -gt 0 ]; do
+		if [[ ! -z "$1" ]]; then
+			printf "%s%s" "$delimiter_to_use" "$1"
+			delimiter_to_use="$delimiter"
+		fi
+		shift
+	done
 }
