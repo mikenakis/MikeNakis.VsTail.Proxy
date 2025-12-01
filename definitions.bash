@@ -111,8 +111,8 @@ function get_xml_value()
 	declare -r value=$(cat $file | sed -ne "/$element/{s/.*<$element>\(.*\)<\/$element>.*/\1/p;q;}")
 
 	if [[ -z "$value" ]]; then
-		value=default
+		value="$default"
 	fi
 
-	printf $value
+	printf "$value"
 }
