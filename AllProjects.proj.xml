@@ -61,10 +61,8 @@
 		<!--<PathMap Condition="'$(NoPathMap)' != 'True'">$(MSBuildProjectDirectory)=.\..\$(MSBuildProjectName)</PathMap>-->
 
 		<!-- PEARL: MSBuild will automagically append a pile of garbage (a git commit hash) to the assembly
-		     informational version attribute in the auto-generated AssemblyInfo.cs. Rumor has it that this is done
-			 in order to facilitate 'sourcelink'.
-			 The following magical incantation is necessary to prevent this from happening.
-			 From https://stackoverflow.com/a/77051386/773113. -->
+		     informational version attribute in the auto-generated AssemblyInfo.cs. The following magical incantation is
+			 necessary to prevent this from happening. Found here: https://stackoverflow.com/a/77051386/773113. -->
 		<IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
 		
 	</PropertyGroup>
@@ -177,12 +175,6 @@
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
 		<PackageReference Include="MSTest.TestAdapter" Version="3.6.2" />
 		<PackageReference Include="MSTest.TestFramework" Version="3.6.2" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<!-- See "Enable debugging and diagnostics with Source Link"
-		    https://learn.microsoft.com/en-us/visualstudio/debugger/how-to-improve-diagnostics-debugging-with-sourcelink -->
-		<!--<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All"/>-->
 	</ItemGroup>
 
 	<Target Name="VersioningTarget">
