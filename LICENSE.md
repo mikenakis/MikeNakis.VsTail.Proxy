@@ -1,4 +1,4 @@
-D:/Personal/Dev/Dotnet/Main/MikeNakis.VsTail.Proxy/# MIT License
+# MIT License
 
 Copyright (c) Michael Belivanakis a.k.a. Mike Nakis a.k.a. michael.gr.
 
