@@ -30,3 +30,15 @@ M:System.Object.ReferenceEquals(System.Object,System.Object) ; Use `object.Refer
 //M:System.Linq.Enumerable.SequenceEqual`1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``0}) ; Use `DotNetHelpers.Equals()` instead.
 
 //T:Graphs.DirectedGraph`1;Don't use it
+
+// PEARL: The documentation for the `System.Diagnostics.Process.GetCurrentProcess()` method says that it returns a new
+//        object, and a quick examination of the source code confirms this. This means that each time you invoke this
+//        method, you are generating garbage. This can be very highly problematic if you are invoking this method in a
+//        loop while performing garbage collection: you are generating garbage while trying to collect garbage, adding
+//        more work to yourself. This does not work well. Furthermore, the `System.Diagnostics.Process` class is... (oh
+//        god... oh dear god... OH MY FUCKING GAWD!) ***disposable***. That's right, each time you invoke this method
+//        you must not forget to dispose what it returns. Even though the name of the function does not give the
+//        sligtest hint that you should do such a thing. It is with a fairly high degree of certainty that we can say
+//        that in the entire history of DotNet nobody ever bothered with disposing the result of GetCurrentProcess().
+//        We bring an end to this insanity right here.
+M:System.Diagnostics.Process.GetCurrentProcess() ; Use `DotNetHelpers.CurrentProcess` instead.

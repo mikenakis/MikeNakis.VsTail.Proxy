@@ -938,7 +938,11 @@ dotnet_diagnostic.CA1005.severity = none
 # CA1007: Undocumented/Nonexistent
 
 # CA1008: "Enums should have zero value"
-dotnet_diagnostic.CA1008.severity = warning
+dotnet_diagnostic.CA1008.severity = none
+# PEARL: This stupid inspection does not only trigger on enums that do not have a zero value; it also triggers on
+#    enums that do have a zero value, but it is called something other than 'None'. Whoever decided that this should
+#    work this way is a complete retard.
+# Justification: Enums should have whatever values we choose.
 
 # CA1009: Undocumented/Nonexistent
 
@@ -1664,8 +1668,10 @@ dotnet_diagnostic.CA2153.severity = warning
 dotnet_diagnostic.CA2200.severity = warning
 
 # CA2201: "Do not raise reserved exception types"
-# TODO: Good to have; should turn into a warning.
-dotnet_diagnostic.CA2201.severity = suggestion
+dotnet_diagnostic.CA2201.severity = none
+# Justification: there is no such thing as reserved exception types.
+#    If I need to throw a System.IndexOutOfRange exception, then that is what I will throw.
+#    Whoever at Microsoft decided that this should somehow be a "reserved" exception type can go fuck themselves.
 
 # CA2207: "Initialize value type static fields inline"
 dotnet_diagnostic.CA2207.severity = warning
@@ -1696,9 +1702,12 @@ dotnet_diagnostic.CA2214.severity = warning
 dotnet_diagnostic.CA2215.severity = warning
 
 # CA2216: "Disposable types should declare finalizer"
-# TODO: I am not sure what is going on here; none of our disposable types declares a finalizer, and yet I have never
-#       seen this rule trigger. Investigate this.
-dotnet_diagnostic.CA2216.severity = warning
+# PEARL: This is not about disposable types. This is about disposable types that contain unmanaged resources.
+dotnet_diagnostic.CA2216.severity = none
+# Justification: We have absolutely no need for special handling of types containing unmanaged resources because
+#    we are not making use of the retarded `Dispose( bool disposing )` pattern.
+#    We are making use of the mandatory disposal pattern, (see `LifeGuard`,) which allows us to handle both managed and
+#    unmanaged resources the same way.
 
 # CA2217: "Do not mark enums with FlagsAttribute"
 # TODO: Revise this.
