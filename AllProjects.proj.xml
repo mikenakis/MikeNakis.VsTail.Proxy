@@ -2,7 +2,6 @@
 <Project>
 
 	<PropertyGroup>
-		<LangVersion>13</LangVersion>
 		<ImplicitUsings>Disable</ImplicitUsings>
 		<Nullable>Enable</Nullable>
 		<DebugSymbols>True</DebugSymbols>
