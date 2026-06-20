@@ -9,8 +9,8 @@
 #        highlighting of comments vs. properties, but it does not do any syntax checking or auto-completion.
 #        The documentation (https://learn.microsoft.com/en-us/visualstudio/ide/create-portable-custom-editor-options)
 #        says that it does, but the documentation is aparently outdated.
-#        The documentation also says that the "EditorConfig Language Service" extension does even more, but this
-#        extension has not been updated since 2021 and is incompatible with VS2022.
+#        The documentation also says that the "EditorConfig Language Service" extension does even more, but in fact
+#        this extension has not been updated since 2021 and is incompatible with VS2022.
 # PEARL: As a result of the above, if something is misconfigured in editorconfig, not only it does not work, it also
 #        doesn't give you the slightest hint that it does not work, and when you finally realize that it does not work,
 #        it still does not give you the slighest hint as to _why_ it does not work.
@@ -19,9 +19,10 @@
 #        being done under a regime of silent failure.)
 # PEARL: Microsoft code analysis makes extensive use of cryptic identifiers like IDE0001 or CA1001.
 # PEARL: Different documents from Microsoft use conflicting terminology: an identifier like IDE0001 is sometimes 
-#        referred to as 'rule id' and sometimes as 'diagnostic code'. The term 'diagnostic code' is unfortunate because
-#        it already has a completely unrelated established meaning in the industry. Thus, we will be using the term
-#        'rule id' here.
+#        referred to as 'rule id' and sometimes as 'diagnostic code'.
+#        The term 'diagnostic code' is unfortunate because it already has a completely unrelated established meaning in
+#        the industry, that of a 'result' or an indication being generated to show the outcome of an operation.
+#        Thus, we will be using the term 'rule id' here.
 # PEARL: There exist two largely separate but also in many ways intertwined systems of notation for controlling code
 #        analysis:
 #          - "rule ids" (e.g. `dotnet_diagnostic.IDE0008.severity`)
@@ -46,7 +47,8 @@
 #        - check Options -> Text Editor -> C# -> Advanced -> "Display diagnostics Inline (experimental)".
 # PEARL: Inline diagnostics will only be shown for certain classes of messages (CSxxxx and IDExxxx) but not for other
 #        classes of messages (CAxxxx) which will only be shown in the output window when building.
-# PEARL: When you execute `dotnet format` on a non-trivial solution, it will very likely issue the following message:
+# PEARL: The order in which projects are listed in the solution file matters!
+#        When you execute `dotnet format` on a non-trivial solution, it will very likely issue the following message:
 #          > Warnings were encountered while loading the workspace. Set the verbosity option to the 'diagnostic' level
 #          > to log warnings.
 #        If you do as the message says, then there will be a bunch of lines like the following:
@@ -60,7 +62,7 @@
 #        project reference, so you have no way of fixing this without trial and error in the blind.
 # PEARL: For many of the rules, if you set their severity to warning, then `dotnet format` will fail with the message
 #        "Unable to fix <rule-id>. No associated code fix found."  That is one of the reasons why we never use
-#        `dotnet format`, (the command is useless,) we only use `dotnet format whitespace --folder .`.
+#        `dotnet format`, (the command is totally useless,) we only use `dotnet format whitespace --folder .`.
 
 root = true
 
@@ -91,8 +93,8 @@ indent_size = tab
 #    Thus, all your builds on the build server will be issuing warnings about inconsistent line-endings, because all
 #    your files will have lf endings on the build server, but your .editorconfig file requires crlf endings.
 #    Therefore, this option must not be used.
-#    Also note that .editorconfig will never support an "auto" value for `end_of_line`;
-#        see https://github.com/editorconfig/editorconfig/issues/226
+#    Also note that from the looks of it, .editorconfig will never support an "auto" value for `end_of_line`;
+#        see https://github.com/editorconfig/editorconfig/issues/226#issuecomment-343961943
 # end_of_line = crlf <-- We intentionally do _not_ set this!
 # Justification: If we were to use this option, then it would have to be crlf, because nothing else works, (see comments
 #   above,) but if the build server is linux, then crlf does not work either, (see comments above,) therefore this
@@ -112,8 +114,9 @@ max_line_length = off
 #    feature of the editor is for.
 
 # The "guidelines" setting is implemented by a Visual Studio Extension.
-# - "EditorConfig Guidelines" by Ivan.Z
-# - "Editor Guidelines" by Paul Harrington
+# "EditorConfig Guidelines" by Ivan.Z https://marketplace.visualstudio.com/items?itemName=Ivan.EditorConfigGuidelines
+# "Editor Guidelines" by Paul Harrington https://marketplace.visualstudio.com/items?itemName=PaulHarrington.EditorGuidelinesPreview
+# The better one is "Editor Guidelines" by Paul Harrington.
 guidelines = 120
 # Justification: Toto I don't think we are in the Eighties anymore.
 
@@ -122,7 +125,8 @@ guidelines_style = 2px dotted 40966969
 
 ###############################################################################
 
-# PEARL: As of the time of writing this, there exists no official, authoritative reference for the spell checker.
+# PEARL: As of the time of writing this, there exists no official, systematic, exhaustive authoritative reference for
+#        the spell checker.
 #        All that exists is a "learn about" article and some blog posts that talk about it in hand-wavy terms:
 #         - "Visual Studio Spell Checker Preview Now Available"
 #           https://devblogs.microsoft.com/visualstudio/visual-studio-spell-checker-preview-now-available/
@@ -132,16 +136,15 @@ guidelines_style = 2px dotted 40966969
 #           https://devblogs.microsoft.com/visualstudio/improving-the-spell-checker/
 # PEARL: For the spell-checker to work, it is not enough to configure it in the .editorconfig file;
 #        each developer must also manually select "Enable Spell Checker" in Visual Studio -> Edit -> Advanced.
-# PEARL: The spell-checking dictionary for "en-us" apparently includes the word "Covfefe".
 # PEARL: The spell checker will only examine .cs files and .md files; putting the spell-checker options in a [*]
 #        section has no effect: the spell checker will still refuse to examine anything but .cs files and .md files.
 #        This means that .xaml files, .csproj files, and even this very .editorconfig file, will NOT be spell-checked,
 #        and there is absolutely nothing we can do about it. Because, Microsoft.
-#        This is especially evil in light of the fact it is precisely these file formats that have the most to benefit
-#        from spell-checking, since spelling mistakes in these files cause silent failure.
+#        This is especially evil in light of the fact it is precisely .xaml and .csproj files that have the most to
+#        benefit from spell-checking, since spelling mistakes in those files cause silent failure.
 
-[*.cs;*.md]
-
+# PEARL: The spell-checking dictionary for "en-us" apparently includes the word "Covfefe".
+# PEARL: The spell-checking dictionary for "en-us" apparently includes both "analyze" and "analyse".
 spelling_languages = en-us
 # Justification: "initialise" instead of "initialize" makes me angry.
 
@@ -159,9 +162,9 @@ spelling_use_default_exclusion_dictionary = false
 #    do not want to allow.
 
 # Possible values seem to be: error, warning, information, hint.
-# PEARL: this setting is a joke. It will only affect the coloring of spelling messages in the editor and in the "Error
-#	List" window of Visual Studio. Selecting "error" will not fail the build, and will not give us any way to see all
-#   spelling mistakes in the entire solution. (Spelling mistakes will only be shown in unopened files.)
+# PEARL: This setting is a joke. Selecting "error" will not fail the build, and will not give us any way to see all
+#   spelling mistakes in the entire solution. (Spelling mistakes will only be shown in the file currently being edited.)
+#   This setting only affects the coloring of spelling messages in the Visual Studio editor and "Error List" window. 
 spelling_error_severity = information
 
 ########################################################################################################################
@@ -293,8 +296,8 @@ dotnet_naming_rule.test_methods_should_be_appropriately_named.style    = test_me
 # CA1812: Avoid uninstantiated internal classes
 #         a.k.a. "'<?>' is an internal class that is apparently never instantiated. If so, [bla bla...]"
 dotnet_diagnostic.CA1812.severity = none
-# Justification: The compiler has no notion of WPF and how it works, so it is under the impression that we never 
-#    instantiate any of our views, converters, etc.
+# Justification: The compiler has no notion of WPF and how it works, so it is under the impression that most of our
+#    views are never instantiated.
 
 ########################################################################################################################
 
@@ -317,7 +320,7 @@ indent_size = 2
 # BuildCheck rules (BCxxxx)
 # These rules are experimental, and not enabled by default.
 # There is (yet) no documented way of enabling BuildCheck rules when compiling from within Visual Studio.
-# The only wat to enable these rules is via the "/check" option to "dotnet build" or "msbuild".
+# The only way to enable these rules is via the "/check" option to "dotnet build" or "msbuild".
 
 # BC0101: "Two projects should not share their OutputPath or IntermediateOutputPath locations" aka "Projects <a> and <b> have conflicting output paths: <c>"
 # PEARL: This warning flags every single WPF project because the build system compiles both ProjectName.csproj and some ProjectName_random-letters_wpftmp.csproj.
@@ -338,9 +341,21 @@ build_check.BC0107.severity=warning
 build_check.BC0201.severity=warning
 
 # BC0202: "A property should be declared before it is first used."
-# PEARL: This always gives "property 'Description' used before it was initialized", so it is useless.
+# PEARL: This always gives "property '<>' used before it was initialized", so it is useless.
 build_check.BC0202.severity=none
 
-# BC0203: " Property declared but never used." a.k.a. "A property that is not used should not be declared" a.k.a. "Property: '<a>' was declared/initialized, but it was never used."
+# BC0203: "Property declared but never used." a.k.a. "A property that is not used should not be declared" a.k.a. "Property: '<>' was declared/initialized, but it was never used."
 build_check.BC0203.severity=none
 # Justification: the documentation page says "it can have false positives - for this reasons[sic] it's currently not enabled by defaut."
+
+########################################################################################################################
+# Banned API analyzers exclusions
+# PEARL: to avoid banned symbol warnings in a specific file, we are told we should create an .editorconfig section for
+#    that file, and put the following in it:
+#  - `generated_code = true` (it does not work)
+#  - `dotnet_analyzer_diagnostic.severity = none` (it does not work)
+# As it turns out, the only magical incantation that _does_ seem to work is this one:
+#  - `dotnet_diagnostic.RS0030.severity = none`
+
+[*.Designer.cs]
+dotnet_diagnostic.RS0030.severity = none

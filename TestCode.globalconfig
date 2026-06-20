@@ -17,9 +17,8 @@ dotnet_diagnostic.IDE0100.severity = none
 # PEARL: To set the severity, we have to use 'dotnet_diagnostic.CA1707.severity', but to set the api surface, we have
 #        to use 'dotnet_code_quality.CA1707.api_surface'! Go figure.
 dotnet_diagnostic.CA1707.severity = none
+dotnet_code_quality.CA1707.api_surface = all
 # Justification: Underscores are allowed in test method names, in test class names, and in test namespaces.
-
-	dotnet_code_quality.CA1707.api_surface = all
 
 # CA1515: "Consider making public types internal"
 dotnet_diagnostic.CA1515.severity = none
@@ -39,13 +38,16 @@ dotnet_diagnostic.CA1515.severity = none
 # dotnet_naming_rule.<RuleName>.severity = one of: error, warning, suggestion, silent, none, default
 # NOTE: You must specify a capitalization style as part of your naming style, otherwise your naming style might be ignored.
 
+# define a style called 'test_method_style'
 dotnet_naming_style.test_method_style.capitalization = pascal_case
 #dotnet_naming_style.test_method_style.required_prefix = T
 dotnet_naming_style.test_method_style.word_separator = _
 
+# define a group of symbols called 'test_methods'
 dotnet_naming_symbols.test_methods.applicable_kinds            = method
 dotnet_naming_symbols.test_methods.applicable_accessibilities  = public
 
+# configure 'test_methods' to use 'test_method_style'
 dotnet_naming_rule.test_methods_should_be_appropriately_named.severity = warning
 dotnet_naming_rule.test_methods_should_be_appropriately_named.symbols  = test_methods
 dotnet_naming_rule.test_methods_should_be_appropriately_named.style    = test_method_style

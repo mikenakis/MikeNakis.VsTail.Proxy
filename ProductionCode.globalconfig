@@ -10,9 +10,11 @@ dotnet_diagnostic.IDE0100.severity = warning
 # PEARL: To set the severity, we have to use 'dotnet_diagnostic.CA1707.severity', but to set the api surface, we have to
 #        use 'dotnet_code_quality.CA1707.api_surface'! Go figure.
 dotnet_diagnostic.CA1707.severity = true
-
-	dotnet_code_quality.CA1707.api_surface = all
+dotnet_code_quality.CA1707.api_surface = public
+# Justification: Visible identifiers should follow standard naming conventions, i.e. be PascalCase and contain no
+# underscores. Mon-visible identifiers should give the programmer more freedom, i.e. the freedom to add underscores.
 
 # CA1515: "Consider making public types internal"
-dotnet_diagnostic.CA1515.severity = none
-# Justification: TODO
+dotnet_diagnostic.CA1515.severity = suggestion # TODO: promote to warning.
+# Justification: As the code base stands right now, enabling this would yield an awful lot of warnings. However, it
+# should be enabled one day, as it will promote good programming practices.
