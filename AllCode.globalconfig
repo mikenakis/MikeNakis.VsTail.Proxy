@@ -551,12 +551,14 @@ csharp_style_implicit_object_creation_when_type_is_apparent = true
 dotnet_diagnostic.IDE0110.severity = warning
 
 # IDE0120: "Simplify LINQ expression"
-dotnet_diagnostic.IDE0120.severity = silent
+dotnet_diagnostic.IDE0120.severity = none
 # Justification: 
 #    - I assign no significance whatsoever to the performance overhead of one additional method in the chain.
 #    - I like functions that do only one thing, and by extension function _calls_ that do only one thing.
 #    - I want the presence or absence of `Where()` to signify, at a glance, the presence or absence of a filter. 
 #    - I want the termination method call to be clutter-free, so I can easily see what the entire chain culminates in.
+#    'severity = silent' causes the terminator method call to appear faded out in visual studio, which is annoying,
+#    so we set the severity to 'none' to avoid that.
 
 # IDE0130: "Namespace does not match folder structure"
 # PEARL: If the severity of IDE0130 is 'warning', then `dotnet format style` will crash.
