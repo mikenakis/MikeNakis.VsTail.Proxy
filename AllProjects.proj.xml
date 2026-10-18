@@ -123,9 +123,9 @@
 		<Message Importance="High" Text="TargetFramework: '$(TargetFramework)'; TargetPlatform: '$(TargetPlatform)'; RuntimeIdentifier: '$(RuntimeIdentifier)'" />
 	</Target>-->
 
-	 <Target Name="PrintStuff2" BeforeTargets="CoreCompile">
+	 <!--<Target Name="PrintStuff2" BeforeTargets="CoreCompile">
 		<Message Importance="High" Text="Configuration: '$(Configuration)'; IsTestProject: '$(IsTestProject)'; DefineConstants: '$(DefineConstants)'" />
-	</Target>
+	</Target>-->
 
 	<PropertyGroup Condition="'$(EnableNETAnalyzers)' == 'True'">
 		<AnalysisLevel>latest-Recommended</AnalysisLevel>
