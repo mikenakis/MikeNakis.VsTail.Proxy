@@ -159,6 +159,10 @@
 			intentionally all over the place. This warning is junk. -->
 		<NoWarn>$(NoWarn);CS0809</NoWarn>
 
+		<!-- CS1591: "Missing XML comment for publicly visible type or member '<>'"
+			Justification: #AintNoBodyGotNoTimeFoDat -->
+		<NoWarn>$(NoWarn);CS1591</NoWarn>
+
 		<!-- CS8524: "Switch expression is missing a catch-all clause" (For enums.)
 			a.k.a. "The switch expression does not handle some values of its input type (it is not exhaustive)
 			involving an unnamed enum value. For example, the pattern '(E)2' is not covered."

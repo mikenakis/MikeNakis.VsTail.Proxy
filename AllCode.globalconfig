@@ -2544,46 +2544,6 @@ dotnet_diagnostic.SYSLIB1228.severity = warning
 # SYSLIB1229: "Reserved for System.Text.Json.SourceGeneration."
 dotnet_diagnostic.SYSLIB1229.severity = warning
 
-#######################################################################################################################
-# CSharp compiler warnings
-
-# CS0168: The variable 'var' is declared but never used
-dotnet_diagnostic.CS0168.severity = warning
-
-# CS0612: 'member' is obsolete
-# PEARL: This is not issued on overriding methods! See https://stackoverflow.com/q/79432897/773113
-dotnet_diagnostic.CS0612.severity = warning
-
-# CS0618: "'member' is obsolete: 'text'"
-# PEARL: Although the almost identical warning CS0612 is level 1, this one is level 2. Go figure.
-# PEARL: This is not issued on overriding methods! See https://stackoverflow.com/q/79432897/773113
-dotnet_diagnostic.CS0618.severity = warning
-
-# CS1591: "Missing XML comment for publicly visible type or member '<>'"
-dotnet_diagnostic.CS1591.severity = none
-# Justification: #AintNoBodyGotNoTimeFoDat
-
-# CS1570: "XML comment has badly formed XML - - 'End tag '<>' does not match the start tag 'summary'.'"
-dotnet_diagnostic.CS1570.severity = warning
-
-# CS1572: "XML comment has a param tag for '<>', but there is no parameter by that name"
-dotnet_diagnostic.CS1572.severity = warning
-
-# CS1573: "Parameter '<>' has no matching param tag in the XML comment for '<>' (but other parameters do)"
-dotnet_diagnostic.CS1573.severity = warning
-
-# CS1574: "XML comment has cref attribute '<>' that could not be resolved"
-dotnet_diagnostic.CS1574.severity = warning
-
-# CS1587: "XML comment is not placed on a valid language element"
-dotnet_diagnostic.CS1587.severity = warning
-
-# CS8509: "Switch expression not exhaustive for all possible values" (For enums: a case for a named enum value is missing. For other types: a catch-all case is missing.)
-#         a.k.a. "The switch expression does not handle all possible values of its input type (it is not exhaustive). For example, the pattern '...' is not covered."
-# PEARL: this only applies to switch expressions; there is no way to receive a warning if you miss a switch case in a
-#    switch statement.
-dotnet_diagnostic.CS8509.severity = error
-
 ########################################################################################################################
 # Regular Expression rules (RExxxx)
 
