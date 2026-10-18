@@ -2584,14 +2584,6 @@ dotnet_diagnostic.CS1587.severity = warning
 #    switch statement.
 dotnet_diagnostic.CS8509.severity = error
 
-# CS8524: "Switch expression is missing a catch-all clause" (For enums.)
-#         a.k.a. "The switch expression does not handle some values of its input type (it is not exhaustive) involving an unnamed enum value. For example, the pattern '...' is not covered."
-# PEARL: this only applies to switch expressions; it does nothing for switch statements.
-# PEARL: this rule is retarded! If you enable this rule, and do as it says, then you are shooting yourself in the foot,
-#    because you are then preventing yourself from ever receiving CS8509 "Missing switch case".
-dotnet_diagnostic.CS8524.severity = none
-# Justification: See PEARL comment above.
-
 ########################################################################################################################
 # Regular Expression rules (RExxxx)
 

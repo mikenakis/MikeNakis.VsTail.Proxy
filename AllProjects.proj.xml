@@ -158,6 +158,15 @@
 			Justification: It is perfectly fine for an obsolete member to override a non-obsolete member. We do so
 			intentionally all over the place. This warning is junk. -->
 		<NoWarn>$(NoWarn);CS0809</NoWarn>
+
+		<!-- CS8524: "Switch expression is missing a catch-all clause" (For enums.)
+			a.k.a. "The switch expression does not handle some values of its input type (it is not exhaustive)
+			involving an unnamed enum value. For example, the pattern '(E)2' is not covered."
+			PEARL: this only applies to switch expressions; it does nothing for switch statements.
+			PEARL: this rule is retarded! If you enable this rule, and do as it says, then you are shooting yourself in
+			the foot, because you are then preventing yourself from ever receiving CS8509 "Missing switch case".
+			Justification: See PEARL comment above. -->
+		<NoWarn>$(NoWarn);CS8524</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup Condition="'$(EnableNETAnalyzers)' == 'True'">
