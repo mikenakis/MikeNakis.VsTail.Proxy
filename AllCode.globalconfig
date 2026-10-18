@@ -2559,11 +2559,6 @@ dotnet_diagnostic.CS0612.severity = warning
 # PEARL: This is not issued on overriding methods! See https://stackoverflow.com/q/79432897/773113
 dotnet_diagnostic.CS0618.severity = warning
 
-# CS0809: "Obsolete member overrides non-obsolete member"
-dotnet_diagnostic.CS0809.severity = none
-# Justification: It is perfectly fine for an obsolete member to override a non-obsolete member. We do so intentionally
-#     all over the place. This warning is junk.
-
 # CS1591: "Missing XML comment for publicly visible type or member '<>'"
 dotnet_diagnostic.CS1591.severity = none
 # Justification: #AintNoBodyGotNoTimeFoDat

@@ -153,6 +153,13 @@
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	</PropertyGroup>
 
+	<PropertyGroup>
+		<!-- CS0809: "Obsolete member overrides non-obsolete member"
+			Justification: It is perfectly fine for an obsolete member to override a non-obsolete member. We do so
+			intentionally all over the place. This warning is junk. -->
+		<NoWarn>$(NoWarn);CS0809</NoWarn>
+	</PropertyGroup>
+
 	<ItemGroup Condition="'$(EnableNETAnalyzers)' == 'True'">
 		<!-- PEARL: if a globalconfig file is not found, we get silent failure. -->
 		<GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)\AllCode.globalconfig" />
