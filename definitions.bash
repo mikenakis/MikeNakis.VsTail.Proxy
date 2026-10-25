@@ -134,7 +134,7 @@ function run_this_script_in_its_directory()
 {
 	declare -r directory=$(dirname $(realpath $0))
 	if [[ "$directory" != "$PWD" ]]; then
-		(cd "$directory"; bash $(basename $0) $@)
+		(cd "$directory"; bash $(basename $0) "$@")
 		exit $?
 	fi
 }
