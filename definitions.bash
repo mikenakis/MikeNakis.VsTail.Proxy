@@ -27,7 +27,8 @@ function log()
 	declare -r level=$1; shift
 	declare -r message=$*
 	
-	printf "%s(%s): %s: %s\n" "$self" "$line" "$level" "$message"
+	# [Claude] Write to stderr, because a function called via `$(…)` would otherwise capture its own error messages into its result.
+	printf "%s(%s): %s: %s\n" "$self" "$line" "$level" "$message" >&2
 }
 
 function increment_version()
