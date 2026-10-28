@@ -115,13 +115,13 @@ max_line_length = off
 
 # The "guidelines" setting is implemented by a Visual Studio Extension.
 # "EditorConfig Guidelines" by Ivan.Z https://marketplace.visualstudio.com/items?itemName=Ivan.EditorConfigGuidelines
-# "Editor Guidelines" by Paul Harrington https://marketplace.visualstudio.com/items?itemName=PaulHarrington.EditorGuidelinesPreview
+# "Editor Guidelines" by Paul Harrington https://marketplace.visualstudio.com/items?itemName=PaulHarrington.EditorGuidelines
 # The better one is "Editor Guidelines" by Paul Harrington.
 guidelines = 120
 # Justification: Toto I don't think we are in the Eighties anymore.
 
 # The "Editor Guidelines" extension by Paul Harrington supports styling. That's nice.
-guidelines_style = 2px dotted 40966969
+guidelines_style = 1px solid FF54423D
 
 ###############################################################################
 
