@@ -5,6 +5,7 @@ echo "This script is meant to be sourced from other scripts; it is not meant to 
 set -o errexit # Fail if any command has a non-zero exit status. Equivalent to `-e`. PEARL: it still won't fail if any of the following `set` commands fails.
 set -o nounset # Fail if an undefined variable is referenced. Equivalent to `-u`.
 set -o pipefail # Prevent pipelines from masking errors. (Use `command1 | command2 || true` to mask.)
+shopt -s inherit_errexit # [Claude] PEARL: without this, `errexit` is off inside `$(…)`, so a failing command in a function called via `$(…)` does not stop that function.
 set -C # do not overwrite an existing file when redirecting. use `>|` instead of `>` to override.
 shopt -s expand_aliases # Do not ignore aliases. (What kind of idiot made ignoring aliases the default behavior?)
 #shopt -s extglob # enable extended pattern matching.
@@ -19,7 +20,9 @@ alias error='log "${BASH_SOURCE[0]}" $LINENO ERROR'
 function log()
 {
 	local -; set +x
-	declare -r self=$(realpath --relative-to="$PWD" "$1"); shift
+	declare self
+	self=$(realpath --relative-to="$PWD" "$1"); shift
+	declare -r self
 	declare -r line=$1; shift
 	declare -r level=$1; shift
 	declare -r message=$*
@@ -62,7 +65,9 @@ function increment_version()
 
 function assert_no_untracked_files()
 {
-	declare -r untracked_files=$(git ls-files -o --directory --exclude-standard --no-empty-directory)
+	declare untracked_files
+	untracked_files=$(git ls-files -o --directory --exclude-standard --no-empty-directory)
+	declare -r untracked_files
 	if [ "$untracked_files" != "" ]; then
 		error "You have untracked files!"
 		info $untracked_files
@@ -73,7 +78,9 @@ function assert_no_untracked_files()
 
 function assert_no_tracked_but_unstaged_changes()
 {
-	declare -r unstaged_files=$(git diff-files --name-only)
+	declare unstaged_files
+	unstaged_files=$(git diff-files --name-only)
+	declare -r unstaged_files
 	if [ "$unstaged_files" != "" ]; then
 		error "You have tracked but unstanged changes!"
 		info "$unstaged_files"
@@ -84,7 +91,9 @@ function assert_no_tracked_but_unstaged_changes()
 
 function assert_no_staged_but_uncommitted_changes()
 {
-	declare -r uncommitted_files=$(git diff-index --name-only --cached HEAD)
+	declare uncommitted_files
+	uncommitted_files=$(git diff-index --name-only --cached HEAD)
+	declare -r uncommitted_files
 	if [ "$uncommitted_files" != "" ]; then
 		error "You have staged but uncommitted changes!"
 		info "$uncommitted_files"
@@ -111,13 +120,14 @@ function get_xml_value()
 	declare -r default=${3-}
 
 	# Voodoo magick from Stack Overflow: "Extract XML Value in bash script" https://stackoverflow.com/a/17334043/773113
-	declare value=$(cat $file | sed -ne "/$element/{s/.*<$element>\(.*\)<\/$element>.*/\1/p;q;}")
+	declare value
+	value=$(sed -ne "/$element/{s/.*<$element>\(.*\)<\/$element>.*/\1/p;q;}" "$file")
 
 	if [[ -z "$value" ]]; then
 		value="$default"
 	fi
 
-	printf "$value"
+	printf "%s" "$value"
 }
 
 function git_get_last_commit_message()
@@ -132,7 +142,10 @@ function git_get_last_commit_message()
 
 function run_this_script_in_its_directory()
 {
-	declare -r directory=$(dirname $(realpath $0))
+	declare directory
+	directory=$(realpath "$0")
+	directory=$(dirname "$directory")
+	declare -r directory
 	if [[ "$directory" != "$PWD" ]]; then
 		(cd "$directory"; bash $(basename $0) "$@")
 		exit $?

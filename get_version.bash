@@ -1,12 +1,13 @@
 #!/bin/bash
 
-source $(dirname "$0")/definitions.bash > /dev/null
+source $(dirname "$0")/definitions.bash > /dev/null || exit 1
 
 declare -r version_file_pathname=$(dirname "$0")/version.txt
 
 function run()
 {
-	declare branch=$(git branch --show-current)
+	declare branch
+	branch=$(git branch --show-current)
 	if [[ $branch == master ]]; then
 		branch=""
 	fi
@@ -16,7 +17,9 @@ function run()
 		exit 1
 	fi
 
-	declare -r version=$(cat "$version_file_pathname")
+	declare version
+	version=$(cat "$version_file_pathname")
+	declare -r version
 	declare prefix
 	declare pre_release
 	IFS=- read -r prefix pre_release <<< "$version"
