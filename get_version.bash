@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source $(dirname "$0")/definitions.bash > /dev/null || exit 1
+if ! source $(dirname "$0")/definitions.bash > /dev/null; then exit 1; fi
 
 declare -r version_file_pathname=$(dirname "$0")/version.txt
 
