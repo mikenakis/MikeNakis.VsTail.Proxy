@@ -211,4 +211,27 @@
 		</PropertyGroup>
 	</Target>
 
+	<!-- [Claude] The logo PNG, which serves as the package icon, is generated from the logo SVG next to it, using MikeNakis.SvgConvert.
+	     [Claude] The CI build runs on Linux, where `cmd` and MikeNakis.SvgConvert are unavailable, so the PNG is generated only in local Windows builds, and it is committed.
+	     [Claude] All projects of a repository share its logo, so the PNG is generated only by the project named after the repository; otherwise, a parallel build would write it concurrently.
+	     [Claude] A project can choose the width of its PNG by setting LogoPngWidth before importing this file. -->
+	<PropertyGroup Condition="'$(PackageIcon)' != ''">
+		<LogoPngWidth Condition="'$(LogoPngWidth)' == ''">256</LogoPngWidth>
+		<LogoPngPath>$(MSBuildThisFileDirectory)$(PackageIcon)</LogoPngPath>
+		<LogoSvgPath>$([System.IO.Path]::ChangeExtension($(LogoPngPath), '.svg'))</LogoSvgPath>
+		<RepositoryDirectoryName>$([System.IO.Path]::GetFileName($(MSBuildThisFileDirectory.TrimEnd('\'))))</RepositoryDirectoryName>
+		<GenerateLogoPng>False</GenerateLogoPng>
+		<GenerateLogoPng Condition="'$(OS)' == 'Windows_NT' AND '$(CI)' != 'true' AND '$(MSBuildProjectName)' == '$(RepositoryDirectoryName)' AND Exists('$(LogoSvgPath)')">True</GenerateLogoPng>
+	</PropertyGroup>
+
+	<!-- [Claude] Visual Studio skips building a project that it considers up to date, so the SVG is declared as an input of the project; otherwise, a changed SVG would not regenerate the PNG. -->
+	<ItemGroup Condition="'$(GenerateLogoPng)' == 'True'">
+		<UpToDateCheckInput Include="$(LogoSvgPath)" />
+	</ItemGroup>
+
+	<Target Name="LogoPngTarget" BeforeTargets="BeforeBuild" Condition="'$(GenerateLogoPng)' == 'True'" Inputs="$(LogoSvgPath)" Outputs="$(LogoPngPath)">
+		<Message Importance="High" Text="MikeNakis.SvgConvert png $(LogoSvgPath) $(LogoPngPath) --width=$(LogoPngWidth)" />
+		<Exec WorkingDirectory="$(MSBuildProjectDirectory)" Command="cmd /c MikeNakis.SvgConvert png &quot;$(LogoSvgPath)&quot; &quot;$(LogoPngPath)&quot; --width=$(LogoPngWidth)" />
+	</Target>
+
 </Project>
