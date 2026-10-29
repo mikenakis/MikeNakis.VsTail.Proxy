@@ -134,9 +134,9 @@ so there may be situations where it does not work very well, or it does not work
 
 # License
 
-Published under the MIT license. Do whatever you want with it.
+**All rights reserved.**
 
-Also see [LICENSE.md](LICENSE.md)
+For more information, see [LICENSE.md](LICENSE.md)
 
 # Contributions
 

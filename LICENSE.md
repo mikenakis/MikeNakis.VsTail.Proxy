@@ -1,21 +1,13 @@
-# MIT License
+## License
 
-Copyright (c) Michael Belivanakis a.k.a. Mike Nakis a.k.a. michael.gr.
+# No License - All rights reserved
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+This creative work is explicitly published under _**No License**_.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+I remain the exclusive copyright holder of this software, and you have _**no 
+permission**_ to use, modify, or share the software. The only thing you can do 
+with this software is view its source code and admire it.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+If you want to do anything else with this software, contact me.
+
+More information: [michael.gr - Open Source but No License](https://blog.michael.gr/post/2018-04-open-source-but-no-license/)
