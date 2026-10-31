@@ -7,6 +7,11 @@
 
 set -o errexit -o nounset -o pipefail
 
+if (( $# > 0 )); then
+	echo "This script accepts no arguments; got: $*" >&2
+	exit 1
+fi
+
 declare my_directory
 my_directory=$(realpath --relative-to="$PWD" "$0")
 my_directory=$(dirname "$my_directory")
