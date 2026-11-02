@@ -211,27 +211,47 @@
 		</PropertyGroup>
 	</Target>
 
-	<!-- [Claude] The logo PNG, which serves as the package icon, is generated from the logo SVG next to it, using MikeNakis.SvgConvert.
-	     [Claude] The CI build runs on Linux, where `cmd` and MikeNakis.SvgConvert are unavailable, so the PNG is generated only in local Windows builds, and it is committed.
-	     [Claude] All projects of a repository share its logo, so the PNG is generated only by the project named after the repository; otherwise, a parallel build would write it concurrently.
-	     [Claude] A project can choose the width of its PNG by setting LogoPngWidth before importing this file. -->
-	<PropertyGroup Condition="'$(PackageIcon)' != ''">
-		<LogoPngWidth Condition="'$(LogoPngWidth)' == ''">256</LogoPngWidth>
-		<LogoPngPath>$(MSBuildThisFileDirectory)$(PackageIcon)</LogoPngPath>
-		<LogoSvgPath>$([System.IO.Path]::ChangeExtension($(LogoPngPath), '.svg'))</LogoSvgPath>
-		<RepositoryDirectoryName>$([System.IO.Path]::GetFileName($(MSBuildThisFileDirectory.TrimEnd('\'))))</RepositoryDirectoryName>
-		<GenerateLogoPng>False</GenerateLogoPng>
-		<GenerateLogoPng Condition="'$(OS)' == 'Windows_NT' AND '$(CI)' != 'true' AND '$(MSBuildProjectName)' == '$(RepositoryDirectoryName)' AND Exists('$(LogoSvgPath)')">True</GenerateLogoPng>
+	<!-- [Claude] A project that has an icon SVG named `<project name>-icon.svg` in its directory gets from it, using MikeNakis.SvgConvert, an application icon (ICO) if it is an executable, a package icon (PNG) if it is packed as a library, and both if it is packed as a .NET tool.
+	     [Claude] The icons are generated into the intermediate output directory, so they are never committed.
+	     [Claude] A project can choose the width of its package icon by setting PackageIconWidth before importing this file. -->
+	<PropertyGroup>
+		<IconSvgPath>$(MSBuildProjectDirectory)\$(MSBuildProjectName)-icon.svg</IconSvgPath>
+		<GenerateApplicationIcon>False</GenerateApplicationIcon>
+		<GenerateApplicationIcon Condition="Exists('$(IconSvgPath)') AND ('$(OutputType)' == 'Exe' OR '$(OutputType)' == 'WinExe')">True</GenerateApplicationIcon>
+		<GeneratePackageIcon>False</GeneratePackageIcon>
+		<GeneratePackageIcon Condition="Exists('$(IconSvgPath)') AND (('$(OutputType)' != 'Exe' AND '$(OutputType)' != 'WinExe') OR '$(PackAsTool)' == 'True')">True</GeneratePackageIcon>
 	</PropertyGroup>
 
-	<!-- [Claude] Visual Studio skips building a project that it considers up to date, so the SVG is declared as an input of the project; otherwise, a changed SVG would not regenerate the PNG. -->
-	<ItemGroup Condition="'$(GenerateLogoPng)' == 'True'">
-		<UpToDateCheckInput Include="$(LogoSvgPath)" />
+	<PropertyGroup Condition="'$(GenerateApplicationIcon)' == 'True'">
+		<ApplicationIcon>$(BaseIntermediateOutputPath)$(MSBuildProjectName).ico</ApplicationIcon>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(GeneratePackageIcon)' == 'True'">
+		<PackageIcon>$(MSBuildProjectName)-icon.png</PackageIcon>
+		<PackageIconPath>$(BaseIntermediateOutputPath)$(PackageIcon)</PackageIconPath>
+		<PackageIconWidth Condition="'$(PackageIconWidth)' == ''">256</PackageIconWidth>
+	</PropertyGroup>
+
+	<!-- [Claude] Visual Studio skips building a project that it considers up to date, so the SVG is declared as an input of the project; otherwise, a changed SVG would not regenerate the icons. -->
+	<ItemGroup Condition="'$(GenerateApplicationIcon)' == 'True' OR '$(GeneratePackageIcon)' == 'True'">
+		<UpToDateCheckInput Include="$(IconSvgPath)" />
 	</ItemGroup>
 
-	<Target Name="LogoPngTarget" BeforeTargets="BeforeBuild" Condition="'$(GenerateLogoPng)' == 'True'" Inputs="$(LogoSvgPath)" Outputs="$(LogoPngPath)">
-		<Message Importance="High" Text="MikeNakis.SvgConvert png $(LogoSvgPath) $(LogoPngPath) --width=$(LogoPngWidth)" />
-		<Exec WorkingDirectory="$(MSBuildProjectDirectory)" Command="cmd /c MikeNakis.SvgConvert png &quot;$(LogoSvgPath)&quot; &quot;$(LogoPngPath)&quot; --width=$(LogoPngWidth)" />
+	<ItemGroup Condition="'$(GeneratePackageIcon)' == 'True'">
+		<None Include="$(PackageIconPath)" Pack="True" PackagePath="/" Visible="False" />
+	</ItemGroup>
+
+	<!-- [Claude] MikeNakis.SvgConvert is a .NET tool, listed in `.config/dotnet-tools.json` at the root of the repository, so it is restored before use; restoring takes no time when the tool is already there. -->
+	<Target Name="RestoreDotnetToolsTarget" Condition="'$(GenerateApplicationIcon)' == 'True' OR '$(GeneratePackageIcon)' == 'True'">
+		<Exec WorkingDirectory="$(MSBuildProjectDirectory)" Command="dotnet tool restore" StandardOutputImportance="Low" />
+	</Target>
+
+	<Target Name="ApplicationIconTarget" BeforeTargets="BeforeBuild" DependsOnTargets="RestoreDotnetToolsTarget" Condition="'$(GenerateApplicationIcon)' == 'True'" Inputs="$(IconSvgPath)" Outputs="$(ApplicationIcon)">
+		<Exec WorkingDirectory="$(MSBuildProjectDirectory)" Command="dotnet tool run MikeNakis.SvgConvert windows-ico &quot;$(IconSvgPath)&quot; &quot;$(ApplicationIcon)&quot;" />
+	</Target>
+
+	<Target Name="PackageIconTarget" BeforeTargets="BeforeBuild" DependsOnTargets="RestoreDotnetToolsTarget" Condition="'$(GeneratePackageIcon)' == 'True'" Inputs="$(IconSvgPath)" Outputs="$(PackageIconPath)">
+		<Exec WorkingDirectory="$(MSBuildProjectDirectory)" Command="dotnet tool run MikeNakis.SvgConvert png &quot;$(IconSvgPath)&quot; &quot;$(PackageIconPath)&quot; --width=$(PackageIconWidth)" />
 	</Target>
 
 </Project>
